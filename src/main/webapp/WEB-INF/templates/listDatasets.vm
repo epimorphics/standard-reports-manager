@@ -1,0 +1,22 @@
+#parse("header.vm")
+#set($nav="datasets")
+#parse("navbar.vm")
+#set($baseURI=$uri +"/")
+<div class="container">
+  <h1>Available datasets</h1>
+  #set($datasets = $lib.json.asJson($dsapi.datasetsEndpoint("en", $baseURI)))
+  #foreach($i in $datasets.iterator())
+    <div class="row space-above">
+      <div class="col-md-4"><strong>$i.label.value()</strong></div>
+      <div class="col-md-4">
+          [<a href=$i.structure-api>structure</a>] 
+          [<a href=$i.data-api>data</a>] 
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">$i.description.value()</div>
+    </div>
+  #end
+  
+## outer container div is closed in footer.vm
+#parse("footer.vm")

@@ -1,0 +1,13 @@
+<html>
+<head>
+<title>data API placeholder query submitter</title>
+</head>
+<body>
+<h1>submit JSON query on $name </h1>
+<form method='POST' action='/data-api/placeholder/dataset/$name/data'>
+<textarea cols='80' rows='20' name='json'>
+</textarea>
+<div><input type='submit' name='button' value='SUBMIT' /></div>
+</form>
+</body>
+</html>

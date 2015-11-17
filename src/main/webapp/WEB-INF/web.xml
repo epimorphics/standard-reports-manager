@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <display-name>Data API</display-name>
+
+  <listener>
+    <listener-class>com.epimorphics.appbase.core.AppConfig</listener-class>
+  </listener>
+
+  <listener>
+    <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+  </listener>
+ 
+  <filter>
+    <filter-name>ShiroFilter</filter-name>
+    <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>ShiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher> 
+    <dispatcher>FORWARD</dispatcher> 
+    <dispatcher>INCLUDE</dispatcher> 
+    <dispatcher>ERROR</dispatcher>
+  </filter-mapping>    
+
+  <filter>
+    <filter-name>CORS</filter-name>
+    <filter-class>com.epimorphics.appbase.webapi.CorsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CORS</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>extension-filter</filter-name>
+    <filter-class>com.epimorphics.appbase.webapi.ExtensionFilter</filter-class>
+    <init-param>
+      <param-name>html</param-name>
+      <param-value>text/html</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ttl</param-name>
+      <param-value>text/turtle</param-value>
+    </init-param>
+    <init-param>
+      <param-name>jsonld</param-name>
+      <param-value>application/ld+json</param-value>
+    </init-param>
+    <init-param>
+      <param-name>json</param-name>
+      <param-value>application/json</param-value>
+    </init-param>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>extension-filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+    <filter-name>VelocityFilter</filter-name>
+    <filter-class>com.epimorphics.appbase.webapi.VelocityFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>VelocityFilter</filter-name>
+    <url-pattern>/ui/*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+    <filter-name>Jersey Web Application</filter-name>
+    <filter-class>com.sun.jersey.spi.container.servlet.ServletContainer</filter-class>
+    <init-param>
+      <param-name>com.sun.jersey.config.property.packages</param-name>
+      <param-value>com.epimorphics.webapi,com.epimorphics.server.webapi,com.epimorphics.dms.webapi</param-value>
+    </init-param>
+    <init-param>
+      <param-name>com.sun.jersey.config.feature.FilterForwardOn404</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+         <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+         <param-value>com.sun.jersey.api.container.filter.PostReplaceFilter</param-value>
+     </init-param>
+  </filter>
+ 
+  <filter-mapping>
+    <filter-name>Jersey Web Application</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+ 
+  <welcome-file-list>
+    <welcome-file>ui/index.html</welcome-file>
+  </welcome-file-list>
+  
+  <context-param>
+    <param-name>AppConfig.app</param-name>
+    <!-- Will initialize from first of these it finds -->
+    <param-value>/etc/dms/app.conf,/opt/dms/conf/app.conf,{webapp}/WEB-INF/app.conf</param-value>
+  </context-param>
+  
+</web-app>
