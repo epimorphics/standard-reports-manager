@@ -7,11 +7,11 @@
 package run;
 
 import java.io.File;
-import java.net.URL;
+//import java.net.URL;
 
 import org.apache.catalina.startup.Tomcat;
 
-public class SAPIRun {
+public class SRRun {
 
     public static void main(String[] args) throws Exception {
         String root = "src/main/webapp";
@@ -21,7 +21,7 @@ public class SAPIRun {
 
         tomcat.setBaseDir(".");
 
-        String contextPath = "/dms";
+        String contextPath = "/sr-manager";
 
         File rootF = new File(root);
         if (!rootF.exists()) {
@@ -33,7 +33,7 @@ public class SAPIRun {
         }
 
         org.apache.catalina.Context context = tomcat.addWebapp(contextPath,  rootF.getAbsolutePath());
-        context.setConfigFile(new URL("file:src/main/webapp/META-INF/context.xml"));
+//        context.setConfigFile(new URL("file:src/main/webapp/META-INF/context.xml"));
 
         tomcat.start();
         tomcat.getServer().await();

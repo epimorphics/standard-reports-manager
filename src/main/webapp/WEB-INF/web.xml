@@ -7,25 +7,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
 
   <listener>
     <listener-class>com.epimorphics.appbase.core.AppConfig</listener-class>
-  </listener>
-
-  <listener>
-    <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
-  </listener>
- 
-  <filter>
-    <filter-name>ShiroFilter</filter-name>
-    <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>ShiroFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-    <dispatcher>REQUEST</dispatcher> 
-    <dispatcher>FORWARD</dispatcher> 
-    <dispatcher>INCLUDE</dispatcher> 
-    <dispatcher>ERROR</dispatcher>
-  </filter-mapping>    
+  </listener>   
 
   <filter>
     <filter-name>CORS</filter-name>
@@ -73,21 +55,28 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
   </filter-mapping>
   
   <filter>
+    <filter-name>LogRequestFilter</filter-name>
+    <filter-class>com.epimorphics.simpleAPI.webapi.LogRequestFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>LogRequestFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+   
+  <filter>
     <filter-name>Jersey Web Application</filter-name>
-    <filter-class>com.sun.jersey.spi.container.servlet.ServletContainer</filter-class>
+    <filter-class>org.glassfish.jersey.servlet.ServletContainer</filter-class>
     <init-param>
-      <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>com.epimorphics.webapi,com.epimorphics.server.webapi,com.epimorphics.dms.webapi</param-value>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>com.epimorphics.webapi,com.epimorphics.server.webapi,com.epimorphics.simpleAPI.webapi,com.epimorphics.standardReports.webapi</param-value>
     </init-param>
     <init-param>
-      <param-name>com.sun.jersey.config.feature.FilterForwardOn404</param-name>
+      <param-name>jersey.config.servlet.filter.forwardOn404</param-name>
       <param-value>true</param-value>
     </init-param>
-    <init-param>
-         <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-         <param-value>com.sun.jersey.api.container.filter.PostReplaceFilter</param-value>
-     </init-param>
-  </filter>
+   </filter>
  
   <filter-mapping>
     <filter-name>Jersey Web Application</filter-name>
@@ -101,7 +90,7 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
   <context-param>
     <param-name>AppConfig.app</param-name>
     <!-- Will initialize from first of these it finds -->
-    <param-value>/etc/dms/app.conf,/opt/dms/conf/app.conf,{webapp}/WEB-INF/app.conf</param-value>
+    <param-value>/etc/standard-reports/app.conf,{webapp}/WEB-INF/app.conf</param-value>
   </context-param>
   
 </web-app>
