@@ -6,11 +6,17 @@ Implements both report submission/status tracking web service and backend report
 
 ## Endpoints provided
 
-Endpoint | Usage
----|---
-`/sr-manager/reportRequest?...` | Submit a request (defined by query parameters) via POST, returns location request status information
-`/sr-manager/reportRequest/{id}` | Return status information in JSON for the identified request
-`/sr-manager/report/{id}.{csv|xlsx}` | Return prepared report (may be replaced by S3 endpoint)
+    POST /sr-manager/reportRequest?...
+
+submit a request (defined by query parameters) via POST, returns location request status information.
+
+    GET /sr-manager/reportRequest/{id}
+
+returns status information in JSON for the identified request.
+
+    /sr-manager/report/{id}.{csv|xlsx}
+
+returns a prepared report (may be replaced by S3 endpoint in the future).
 
 ## Requests
 
@@ -21,7 +27,7 @@ Parameter | Values | Default
 `aggregate` | AreaType |
 `age` | `new` `old` `any` | `any`
 `period` | 2015   2015-Q1  2015-03 |
-`report` | `byPrice` `banded | `byPrice`
+`report` | `byPrice` `banded` | `byPrice`
 `sticky` | `true` `false` | `true`
 
 Where AreaType is one of:
