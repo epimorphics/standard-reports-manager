@@ -9,6 +9,9 @@
 
 package com.epimorphics.standardReports.webapi;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -23,12 +26,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.jena.atlas.json.JsonObject;
+import org.yaml.snakeyaml.Yaml;
 
 import com.epimorphics.appbase.webapi.WebApiException;
 import com.epimorphics.armlib.BatchRequest;
 import com.epimorphics.armlib.BatchStatus;
 import com.epimorphics.armlib.BatchStatus.StatusFlag;
+import com.epimorphics.json.JsonUtil;
 import com.epimorphics.simpleAPI.requests.Request;
+import com.epimorphics.simpleAPI.requests.RequestCheck;
 
 @Path("reportRequest")
 public class ReportRequestEndpoint extends SREndpointBase {
@@ -42,7 +48,15 @@ public class ReportRequestEndpoint extends SREndpointBase {
     
     public static final String URL_KEY   = "url";
     public static final String XLS_URL_KEY   = "urlXlsx";
-
+    
+    protected static RequestCheck validator;
+    
+    static {
+        InputStream specIS = ClassLoader.class.getResourceAsStream("/request-validator.yaml");
+        JsonObject spec = JsonUtil.asJson( new Yaml().load( specIS ) ).getAsObject();
+        validator = RequestCheck.fromJson(spec);
+    }
+    
     @POST
     public Response submitRequest() {
         Request request = getRequest();
@@ -58,7 +72,7 @@ public class ReportRequestEndpoint extends SREndpointBase {
     
     public static BatchRequest makeBatchRequest(Request request) {
         BatchRequest br = new BatchRequest("reportRequest", request.getParametersMap());
-        // TODO validation and defaults
+        validator.checkRequest(request);
         StringBuffer keyBuf = new StringBuffer();
         keyBuf.append( request.getFirst(REPORT) );
         keyBuf.append( "-" + request.getFirst(AREA_TYPE) );
