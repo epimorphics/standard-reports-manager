@@ -200,19 +200,11 @@
 
   </build>
   
-
   <distributionManagement>
-     <repository>  
-         <id>epi-private-s3-release</id>  
-         <name>Epimorphics S3 release repository</name>  
-         <url>s3://epi-private-repository/release</url>  
-     </repository>
-       
-     <snapshotRepository>  
-         <id>epi-private-s3-snapshot</id>  
-         <name>Epimorphics S3 snapshot repository</name>  
-         <url>s3://epi-private-repository/snapshot</url>  
-     </snapshotRepository>  
+    <repository>
+      <id>epi-public-repo</id>
+      <url>ftp://epimorphics.com</url>
+    </repository>
   </distributionManagement>
 
 </project>
