@@ -37,6 +37,14 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
       <param-name>json</param-name>
       <param-value>application/json</param-value>
     </init-param>
+    <init-param>
+      <param-name>csv</param-name>
+      <param-value>text/csv</param-value>
+    </init-param>
+    <init-param>
+      <param-name>xlsx</param-name>
+      <param-value>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param-value>
+    </init-param>
   </filter>
   
   <filter-mapping>

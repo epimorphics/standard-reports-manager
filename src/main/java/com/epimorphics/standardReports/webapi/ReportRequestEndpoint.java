@@ -39,6 +39,9 @@ public class ReportRequestEndpoint extends SREndpointBase {
     public static final String PERIOD    = "period";
     public static final String REPORT    = "report";
     public static final String STICKY    = "sticky";
+    
+    public static final String URL_KEY   = "url";
+    public static final String XLS_URL_KEY   = "urlXlsx";
 
     @POST
     public Response submitRequest() {
@@ -75,7 +78,13 @@ public class ReportRequestEndpoint extends SREndpointBase {
         if (status.getStatus() == StatusFlag.Unknown) {
             throw new NotFoundException();
         }
-        // TODO add alternate URLs
-        return status.asJson();
+        JsonObject statusj = status.asJson();
+        // Fix up the URLs for the dual result versions
+        if (statusj.hasKey(URL_KEY)) {
+            String url = uriInfo.getBaseUri() + statusj.get(URL_KEY).getAsString().value();
+            statusj.put(URL_KEY, url);
+            statusj.put(XLS_URL_KEY, url.replaceAll("\\.csv$", ".xlsx"));
+        }
+        return statusj;
     }
 }
