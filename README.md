@@ -14,7 +14,7 @@ submit a request (defined by query parameters) via POST, returns location reques
 
 returns status information in JSON for the identified request.
 
-    /sr-manager/report/{id}.{csv|xlsx}
+    GET /sr-manager/report/{id}.{csv|xlsx}
 
 returns a prepared report (may be replaced by S3 endpoint in the future).
 
