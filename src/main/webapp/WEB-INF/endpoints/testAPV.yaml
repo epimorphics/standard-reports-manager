@@ -1,0 +1,16 @@
+name : testAPV
+type : list
+query: |
+    SELECT (COUNT(?transaction) AS ?count) (SUM(?price) AS ?total) ?region ?type WHERE
+    {
+      ?transaction 
+        ppi:pricePaid ?price;
+        ppi:propertyType [rdfs:label ?type] ;
+        ppi:transactionDate ?date;
+        ppi:propertyAddress [
+             common:county "HAMPSHIRE"^^xsd:string;
+             common:district ?region ] .
+        FILTER (?date >= '2015-07-01'^^xsd:date && ?date < '2015-10-01'^^xsd:date)
+    } GROUP BY ?region ?type ORDER BY ?region ?type
+
+    

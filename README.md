@@ -52,3 +52,8 @@ Field | Value | Notes
 `eta` | time left in ms | Only available of Pending/InProgress
 `started` | date-time string | Time an InProgress request started processing
 
+## Development setup
+
+To run locally but point queries at the dev server set up a local tunnel:
+
+ssh -f lr-data-staging-b -L 3030:ec2-54-246-79-255.eu-west-1.compute.amazonaws.com:3030 -N
