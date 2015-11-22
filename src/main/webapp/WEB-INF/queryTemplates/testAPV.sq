@@ -1,4 +1,4 @@
-SELECT (COUNT(?transaction) AS ?count) (SUM(?price) AS ?total) ?region ?type WHERE
+SELECT (COUNT(?transaction) AS ?count) (SUM(?price) AS ?total) ?area ?type WHERE
     {
       ?transaction 
         ppi:pricePaid ?price;
@@ -6,6 +6,6 @@ SELECT (COUNT(?transaction) AS ?count) (SUM(?price) AS ?total) ?region ?type WHE
         ppi:transactionDate ?date;
         ppi:propertyAddress [
              common:county "HAMPSHIRE"^^xsd:string;
-             common:district ?region ] .
+             common:district ?area ] .
         FILTER (?date >= '2015-07-01'^^xsd:date && ?date < '2015-10-01'^^xsd:date)
-    } GROUP BY ?region ?type ORDER BY ?region ?type
+    } GROUP BY ?area ?type ORDER BY ?area ?type

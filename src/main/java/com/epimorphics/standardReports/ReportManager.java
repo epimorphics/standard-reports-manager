@@ -12,6 +12,7 @@ package com.epimorphics.standardReports;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,6 @@ import com.epimorphics.appbase.core.AppConfig;
 import com.epimorphics.appbase.core.ComponentBase;
 import com.epimorphics.appbase.core.Startup;
 import com.epimorphics.appbase.core.TimerManager;
-import com.epimorphics.appbase.data.ClosableResultSet;
 import com.epimorphics.appbase.data.SparqlSource;
 import com.epimorphics.armlib.BatchRequest;
 import com.epimorphics.armlib.CacheManager;
@@ -87,21 +87,18 @@ public class ReportManager extends ComponentBase implements Startup {
                             
                         } else {
                             // TODO Temporary test implementation
-                            // TODO exception handling is all wrong
                             SRQuery query = srQueryFactory.get("testAPV.sq");
                             if (query == null) {
                                 log.error("Can't find query");
                             } else {
                                 try {
-                                    String q = query.getQuery();
-                                    log.info("Query = " + q);
-                                    ClosableResultSet results = source.streamableSelect( query.getQuery() );
+                                    ResultSet results = source.select( query.getQuery() );
                                     log.info("Query results started");
                                     System.out.println( ResultSetFormatter.asText(results) );
-                                    results.close();
                                     log.info("Request completed");
                                     queue.finishRequest( request.getKey() );
                                 } catch (Exception e) {
+                                    // TODO some sort of retry scheme
                                     log.error("Request failed", e);
                                     queue.failRequest( request.getKey() );
                                 }
