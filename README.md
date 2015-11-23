@@ -24,7 +24,7 @@ Parameter | Values | Default
 ---|---|---
 `areaType` | AreaType (see below) |
 `area` | Name of area (use EW for country) |
-`aggregate` | AreaType |
+`aggregate` | AreaType or `none` | `none`
 `age` | `new` `old` `any` | `any`
 `period` | 2015   2015-Q1  2015-03 |
 `report` | `byPrice` `banded` | `byPrice`
