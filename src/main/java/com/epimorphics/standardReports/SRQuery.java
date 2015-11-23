@@ -22,6 +22,7 @@ import com.epimorphics.armlib.BatchRequest;
 import com.epimorphics.sparql.exprs.Infix;
 import com.epimorphics.sparql.exprs.Op;
 import com.epimorphics.sparql.graphpatterns.Basic;
+import com.epimorphics.sparql.graphpatterns.Bind;
 import com.epimorphics.sparql.query.AbstractSparqlQuery;
 import com.epimorphics.sparql.templates.Settings;
 import com.epimorphics.sparql.terms.Filter;
@@ -63,28 +64,33 @@ public class SRQuery {
         AbstractSparqlQuery q = query.copy();
         SRQuery nq = new SRQuery(q, settings);
         
-        Var address     = new Var("address");
-        Var transaction = new Var("transaction");
+        Var addressVar     = new Var("address");
+        Var transactionVar = new Var("transaction");
+        Var areaVar        = new Var("area");
+        
+        Literal area = asLiteral( params.getFirst(AREA) );
         
         // Inject the area filter
         if ( ! areaType.equals(AT_COUNTRY) ) {
             if (areaType.startsWith(AT_PC_PREFIX)) {
                 // TODO post codes are different and tricky
             } else {
-                nq.addPattern( address, new URI(common(areaType)), asLiteral( params.getFirst(AREA) ) );
+                nq.addPattern( addressVar, new URI(common(areaType)), area );
             }
         }
         
         // Inject the aggregation level pattern
         if ( aggregate.startsWith(AT_PC_PREFIX) ) {
             // TODO post codes are different and tricky
+        } else if (aggregate.equals(AT_NONE)) {
+            nq.query.addEarlyPattern( new Bind( area, areaVar) );
         } else {
-            nq.addPattern( address, new URI(common(aggregate)), new Var("area") );
+            nq.addPattern( addressVar, new URI(common(aggregate)), areaVar );
         }
         
         // Possible filter by age
         if ( ! ageFilter.equals(AGE_ANY)) {
-            nq.addPattern( transaction, new URI(ppi("newBuild")), asLiteral( ageFilter.equals(AGE_NEW) ) );
+            nq.addPattern( transactionVar, new URI(ppi("newBuild")), asLiteral( ageFilter.equals(AGE_NEW) ) );
         }
         
         // Date filter

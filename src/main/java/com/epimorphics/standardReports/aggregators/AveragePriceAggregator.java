@@ -113,7 +113,12 @@ public class AveragePriceAggregator implements SRAggregator {
     private List<String> makeMetadataRows(MultivaluedMap<String, String> request) {
         List<String> metadata = new ArrayList<>();
         metadata.add("Average Prices and Volumes of Sales");
-        metadata.add( String.format("By %s for %s - %s", request.getFirst(AGGREGATE), request.getFirst(AREA_TYPE), request.getFirst(AREA)) );
+        String aggregate = request.getFirst(AGGREGATE);
+        if (aggregate.equals(AT_NONE)) {
+            metadata.add( String.format("For %s - %s", request.getFirst(AREA_TYPE), request.getFirst(AREA)) );
+        } else {
+            metadata.add( String.format("By %s for %s - %s", aggregate, request.getFirst(AREA_TYPE), request.getFirst(AREA)) );
+        }
         metadata.add( request.getFirst(PERIOD) );
         metadata.add( "Age: " + request.getFirst(AGE) );
         return metadata;
