@@ -9,30 +9,23 @@
 
 package com.epimorphics.standardReports.aggregators;
 
-import static com.epimorphics.standardReports.webapi.ReportRequestEndpoint.AGE;
-import static com.epimorphics.standardReports.webapi.ReportRequestEndpoint.AGGREGATE;
-import static com.epimorphics.standardReports.webapi.ReportRequestEndpoint.AREA;
-import static com.epimorphics.standardReports.webapi.ReportRequestEndpoint.AREA_TYPE;
-import static com.epimorphics.standardReports.webapi.ReportRequestEndpoint.PERIOD;
-
+import static com.epimorphics.standardReports.Constants.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.jena.query.QuerySolution;
 
-import com.epimorphics.simpleAPI.requests.Request;
 import com.epimorphics.util.EpiException;
-
-import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * Accumulates data for average prices by area and type, then provides csv and Excel serializations.
  * Non-streaming, data sizes don't warrant it.
  */
-public class AveragePriceAggregator implements Aggregator {
+public class AveragePriceAggregator implements SRAggregator {
     public static final String[] types = new String[]{ "Detached", "Semi-detached", "Terraced", "Flat-maisonette" /*, "other" */ };
     public static final int ROW_LEN = 11;
     public static final String[] HEADER = new String[]{"", "Detached", "Sales", "Semi-det", "Sales", "Terraced", "Sales", "Flat/mais", "Sales", "Overall average", "Total sales"};
@@ -71,84 +64,30 @@ public class AveragePriceAggregator implements Aggregator {
         totals.add(row);
     }
     
-    public void writeAsCSV(OutputStream out, Request request) throws IOException {
-        CSVWriter writer = new CSVWriter( new OutputStreamWriter(out) );
+    public void writeAsCSV(OutputStream out, MultivaluedMap<String, String> request) throws IOException {
+        CSVOutput writer = new CSVOutput(out, ROW_LEN);
         for (String mrow : makeMetadataRows(request)) {
-            writer.writeNext( makeRow(mrow) );
+            writer.addMetaRow(mrow);
         }
-        writer.writeNext(HEADER);
+        writer.addHeaderRow(HEADER);
         for (String area : listAreas()) {
-            MakeRow row = new MakeRow();
-            row.add(area);
+            writer.startRow();
+            writer.add(area);
             for (String type : types) {
-                row.add( getAreaTypeAccumulator(area, type) );
+                writer.add( getAreaTypeAccumulator(area, type) );
             }
-            row.add( getAreaTotal(area) );
-            row.write(writer);
+            writer.add( getAreaTotal(area) );
         }
-        MakeRow row = new MakeRow();
-        row.add("Total");
+        writer.startRow();
+        writer.add("Total");
         for (String type : types) {
-            row.add( totals.getSafeAggregator(type) );
+            writer.add( totals.getSafeAggregator(type) );
         }
-        row.add( totals.getTotal() );
-        row.write(writer);
+        writer.add( totals.getTotal() );
         writer.close();
     }
     
-    private String[] makeRow(Object...args) {
-        MakeRow row = new MakeRow();
-        for (Object arg : args) row.add(arg);
-        return row.getRow();
-    }
-    
-    private List<String> makeMetadataRows(Request request) {
-        List<String> metadata = new ArrayList<>();
-        metadata.add("Average Prices and Volumes of Sales");
-        metadata.add( String.format("By %s for %s - %s", request.getFirst(AGGREGATE), request.getFirst(AREA_TYPE), request.getFirst(AREA)) );
-        metadata.add( request.getFirst(PERIOD) );
-        metadata.add( "Age: " + request.getFirst(AGE) );
-        return metadata;
-    }
-    
-    private static class MakeRow {
-        String[] row = new String[ROW_LEN];
-        int count = 0;
-        
-        public MakeRow() {
-            for(int i = 0; i < ROW_LEN; i++) row[i] = "";
-        }
-        
-        public void add(String value) {
-            if (count >= ROW_LEN +1) throw new EpiException("Too many elements for row");
-            row[count++] = value;
-        }
-        
-        public void add(Accumulator a) {
-            if (count >= ROW_LEN +2) throw new EpiException("Too many elements for row");
-            row[count++] = Long.toString( a.getAverage().longValue() );
-            row[count++] = Long.toString( a.getCount() );
-        }
-        
-        public void add(Object o) {
-            if (o instanceof Accumulator) {
-                add((Accumulator)o);
-            } else {
-                add(o.toString());
-            }
-        }
-        
-        public String[] getRow() {
-            return row;
-        }
-        
-        public void write(CSVWriter writer) {
-            writer.writeNext(row);
-        }
-    }
-    
-    
-    public void writeAsExcel(OutputStream out, Request request) throws IOException {
+    public void writeAsExcel(OutputStream out, MultivaluedMap<String, String> request) throws IOException {
         ExcelWriter writer = new ExcelWriter();
         for (String mrow : makeMetadataRows(request)) {
             writer.addMetaRow( mrow );
@@ -169,6 +108,15 @@ public class AveragePriceAggregator implements Aggregator {
         }
         writer.addAccumulator( totals.getTotal(), true);
         writer.write(out);
+    }
+    
+    private List<String> makeMetadataRows(MultivaluedMap<String, String> request) {
+        List<String> metadata = new ArrayList<>();
+        metadata.add("Average Prices and Volumes of Sales");
+        metadata.add( String.format("By %s for %s - %s", request.getFirst(AGGREGATE), request.getFirst(AREA_TYPE), request.getFirst(AREA)) );
+        metadata.add( request.getFirst(PERIOD) );
+        metadata.add( "Age: " + request.getFirst(AGE) );
+        return metadata;
     }
 
 }

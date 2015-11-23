@@ -80,11 +80,16 @@ public class Accumulator implements Aggregator {
         return total;
     }
     
+    
     public BigDecimal getAverage() {
+        return getAverage(0);
+    }
+    
+    public BigDecimal getAverage(int scale) {
         if (count == 0) {
             return new BigDecimal(0);
         } else {
-            return total.divide( new BigDecimal(count) );
+            return total.divide( new BigDecimal(count), scale, BigDecimal.ROUND_HALF_DOWN );
         }
     }
     

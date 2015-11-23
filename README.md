@@ -57,3 +57,9 @@ Field | Value | Notes
 To run locally but point queries at the dev server set up a local tunnel:
 
 ssh -f lr-data-staging-b -L 3030:ec2-54-246-79-255.eu-west-1.compute.amazonaws.com:3030 -N
+
+Test cases:
+
+curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=HAMPSHIRE&aggregate=district&period=2015-Q3&report=byPrice"
+
+curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=DEVON&aggregate=district&period=2015-Q3&report=byPrice"

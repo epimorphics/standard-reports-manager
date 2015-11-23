@@ -30,14 +30,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ExcelWriter {
     XSSFWorkbook wb;
     
-    public XSSFCellStyle highlightStyle;
-    public XSSFCellStyle normalStyle;
+    XSSFCellStyle highlightStyle;
+    XSSFCellStyle normalStyle;
     XSSFCellStyle normalStripeStyle;
     XSSFCellStyle normalStripeBoldStyle;
-    public XSSFCellStyle currencyStyle;
+    XSSFCellStyle currencyStyle;
     XSSFCellStyle currencyStripeStyle;
-    public XSSFCellStyle currencyHighlightStyle;
-    public XSSFCellStyle boldStyle;
+    XSSFCellStyle currencyHighlightStyle;
+    XSSFCellStyle boldStyle;
     
     Font normal;
     Font bold;

@@ -9,8 +9,8 @@
 
 package com.epimorphics.standardReports.webapi;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import static com.epimorphics.standardReports.Constants.*;
+
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,15 +36,8 @@ import com.epimorphics.json.JsonUtil;
 import com.epimorphics.simpleAPI.requests.Request;
 import com.epimorphics.simpleAPI.requests.RequestCheck;
 
-@Path("reportRequest")
+@Path("report-request")
 public class ReportRequestEndpoint extends SREndpointBase {
-    public static final String AREA_TYPE = "areaType";
-    public static final String AREA      = "area";
-    public static final String AGGREGATE = "aggregate";
-    public static final String AGE       = "age";
-    public static final String PERIOD    = "period";
-    public static final String REPORT    = "report";
-    public static final String STICKY    = "sticky";
     
     public static final String URL_KEY   = "url";
     public static final String XLS_URL_KEY   = "urlXlsx";
@@ -61,7 +54,7 @@ public class ReportRequestEndpoint extends SREndpointBase {
     public Response submitRequest() {
         Request request = getRequest();
         BatchStatus bs = getRequestManager().submit( makeBatchRequest(request) );
-        String statusURL = context.getContextPath() + "/reportRequest/" + bs.getKey();
+        String statusURL = context.getContextPath() + "/report-request/" + bs.getKey();
         try {
             return Response.created( new URI(statusURL) ).build();
         } catch (URISyntaxException e) {
@@ -71,7 +64,7 @@ public class ReportRequestEndpoint extends SREndpointBase {
     }
     
     public static BatchRequest makeBatchRequest(Request request) {
-        BatchRequest br = new BatchRequest("reportRequest", request.getParametersMap());
+        BatchRequest br = new BatchRequest("report-request", request.getParametersMap());
         validator.checkRequest(request);
         StringBuffer keyBuf = new StringBuffer();
         keyBuf.append( request.getFirst(REPORT) );
@@ -81,6 +74,11 @@ public class ReportRequestEndpoint extends SREndpointBase {
         keyBuf.append( "-" + request.getFirst(AGE) );
         keyBuf.append( "-" + request.getFirst(PERIOD) );
         br.setKey( keyBuf.toString() );
+        
+        br.setSticky( request.getFirst(STICKY).equalsIgnoreCase("true"));
+        
+        // TODO set estimated time based on at least area type
+        
         return br;
     }
     

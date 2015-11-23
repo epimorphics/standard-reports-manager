@@ -18,14 +18,16 @@ import java.util.function.Supplier;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.rdf.model.Literal;
-
-import com.epimorphics.util.EpiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Aggregates result rows as a set of accumulators indexed by some
  * variable.. 
  */
 public class IndexedAggregator implements Aggregator {
+    static Logger log = LoggerFactory.getLogger( IndexedAggregator.class );
+    
     protected String countVar = "count";
     protected String totalVar = "total";
     protected String indexVar = "index";
@@ -87,18 +89,21 @@ public class IndexedAggregator implements Aggregator {
         total.add(row);
 
         String index = getIndex(row);
-        Aggregator a = aggregates.get( index );
-        if (a == null) {
-            a = supplier.get();
-            aggregates.put(index, a);
+        if (index != null){
+            Aggregator a = aggregates.get( index );
+            if (a == null) {
+                a = supplier.get();
+                aggregates.put(index, a);
+            }
+            a.add(row);
         }
-        a.add(row);
     }
     
     private String getIndex(QuerySolution row) {
         Literal index = row.getLiteral(indexVar);
         if (index == null) {
-            throw new EpiException("No value for index found in solution row");
+            log.error("No value for index in solution row, assuming this is an empty result set");
+            return null;
         }
         return index.getLexicalForm();
     }

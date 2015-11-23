@@ -17,14 +17,15 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.util.FileManager;
+import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.junit.Test;
-
-import com.epimorphics.simpleAPI.requests.Request;
 
 public class TestAggregators {
 
@@ -80,7 +81,7 @@ public class TestAggregators {
         apa.add( makeRow("count", 5, "total",   200000, "area", "bar", "type", "Semi-detached") );
         apa.add( makeRow("count", 5, "total",    20000, "area", "bar", "type", "Terraced") );
         
-        Request request = new Request("http://localhost/");
+        MultivaluedMap<String, String> request = new MultivaluedStringMap();
         request.add("area", "HAMPSHIRE");
         request.add("areaType", "County");
         request.add("aggregate", "district");
@@ -93,6 +94,7 @@ public class TestAggregators {
         String expected = FileManager.get().readWholeFileAsUTF8("src/test/data/testAPV.csv");
         assertEquals(expected, out.toString());
         
+        // Testing the output is correct is tricky (and currently manual) but at least this checks it runs
         FileOutputStream fout = new FileOutputStream("target/test.xlsx");
         apa.writeAsExcel(fout, request);
     }

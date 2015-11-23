@@ -9,11 +9,13 @@
 
 package com.epimorphics.standardReports;
 
+import static com.epimorphics.standardReports.Constants.*;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +25,15 @@ import com.epimorphics.appbase.core.ComponentBase;
 import com.epimorphics.appbase.core.Startup;
 import com.epimorphics.appbase.core.TimerManager;
 import com.epimorphics.appbase.data.SparqlSource;
+import com.epimorphics.appbase.util.TimeStamp;
 import com.epimorphics.armlib.BatchRequest;
 import com.epimorphics.armlib.CacheManager;
 import com.epimorphics.armlib.QueueManager;
 import com.epimorphics.armlib.RequestManager;
+import com.epimorphics.standardReports.aggregators.AveragePriceAggregator;
+import com.epimorphics.standardReports.aggregators.SRAggregator;
+import com.epimorphics.util.FileUtil;
+import com.epimorphics.util.NameUtils;
 
 /**
  * The manager for requesting and generating standard reports.
@@ -34,13 +41,15 @@ import com.epimorphics.armlib.RequestManager;
  * @author <a href="mailto:dave@epimorphics.com">Dave Reynolds</a>
  */
 public class ReportManager extends ComponentBase implements Startup {
-    public static final String TEST_PARAM = "test";
     public static final String MOCK_DATA = "{webapp}/mockData/All_Postcode_Districts_within_GREATER_LONDON";
+
+    protected static int RETRY_LIMIT = 2;
     
     static Logger log = LoggerFactory.getLogger( ReportManager.class );
     
     protected RequestManager requestManager;
     protected SRQueryFactory srQueryFactory;
+    protected File  workDir;
 
     public RequestManager getRequestManager() {
         return requestManager;
@@ -52,6 +61,12 @@ public class ReportManager extends ComponentBase implements Startup {
     
     public void setTemplateDir(String templateDir) {
         srQueryFactory = new SRQueryFactory( expandFileLocation(templateDir) );
+    }
+    
+    public void setWorkDir(String workDir) {
+        String dir = expandFileLocation(workDir);
+        this.workDir = new File( dir );
+        FileUtil.ensureDir(dir);
     }
     
     @Override
@@ -68,7 +83,7 @@ public class ReportManager extends ComponentBase implements Startup {
             CacheManager cache = requestManager.getCacheManager();
             SparqlSource source = AppConfig.getApp().getA(SparqlSource.class);
             if (source == null) {
-                log.error("Can't find source to query from");
+                log.error("Fatal configuration error: can't find source to query from");
                 return;
             }
 
@@ -86,21 +101,51 @@ public class ReportManager extends ComponentBase implements Startup {
                             cache.upload(request, "xlsx", new File( expandFileLocation(MOCK_DATA) + ".xlsx"));
                             
                         } else {
-                            // TODO Temporary test implementation
-                            SRQuery query = srQueryFactory.get("testAPV.sq");
+                            // TODO will need to generalize this for different aggregation types
+                            String reportType = request.getParameters().getFirst(REPORT);
+                            String queryTemplate =  reportType + ".sq";
+                            SRQuery query = srQueryFactory.get(queryTemplate);
+                            
                             if (query == null) {
-                                log.error("Can't find query");
+                                log.error("Fatal configuration error: can't find query - " + queryTemplate);
+                                queue.failRequest( request.getKey() );
+                                
                             } else {
-                                try {
-                                    ResultSet results = source.select( query.getQuery() );
-                                    log.info("Query results started");
-                                    System.out.println( ResultSetFormatter.asText(results) );
-                                    log.info("Request completed");
-                                    queue.finishRequest( request.getKey() );
-                                } catch (Exception e) {
-                                    // TODO some sort of retry scheme
-                                    log.error("Request failed", e);
-                                    queue.failRequest( request.getKey() );
+                                query = query.bindRequest(request);
+                                boolean succeeded = false;
+                                for (int retry = 0; retry < RETRY_LIMIT && !succeeded; retry++) {
+                                    try {
+                                        long start = System.currentTimeMillis();
+                                        ResultSet results = source.select( query.getQuery() );
+                                        SRAggregator agg = reportType.equals(REPORT_BYPRICE) ? new AveragePriceAggregator() : /* TODO */ null;
+                                        while (results.hasNext()) {
+                                            agg.add( results.next() );
+                                        }
+                                        
+                                        File file = new File(workDir, request.getKey() + ".csv");
+                                        agg.writeAsCSV(new FileOutputStream(file), request.getParameters());
+                                        cache.upload(request, "csv", file);
+                                        file.delete();
+                                        
+                                        file = new File(workDir, request.getKey() + ".xlsx");
+                                        agg.writeAsExcel(new FileOutputStream(file), request.getParameters());
+                                        cache.upload(request, "xlsx", file);
+                                        file.delete();
+    
+                                        long duration = System.currentTimeMillis() - start;
+                                        log.info("Request completed: " + request.getKey() + " in " + NameUtils.formatDuration(duration));
+                                        queue.finishRequest( request.getKey() );
+                                        succeeded = true;
+    
+                                    } catch (Exception e) {
+                                        if (retry < RETRY_LIMIT - 1) {
+                                            log.error("Request " + request.getKey() + " failed" , e);
+                                            queue.failRequest( request.getKey() );
+                                        } else {
+                                            log.warn("Request " + request.getKey() + " failed, retrying after 10s" , e);
+                                            Thread.sleep(10000);
+                                        }
+                                    }
                                 }
                             }
                         }
