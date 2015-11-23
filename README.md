@@ -6,11 +6,11 @@ Implements both report submission/status tracking web service and backend report
 
 ## Endpoints provided
 
-    POST /sr-manager/reportRequest?...
+    POST /sr-manager/report-request?...
 
 submit a request (defined by query parameters) via POST, returns location request status information.
 
-    GET /sr-manager/reportRequest/{id}
+    GET /sr-manager/report-request/{id}
 
 returns status information in JSON for the identified request.
 
@@ -29,6 +29,7 @@ Parameter | Values | Default
 `period` | 2015   2015-Q1  2015-03 |
 `report` | `byPrice` `banded` | `byPrice`
 `sticky` | `true` `false` | `true`
+`test` | `true` `false` | `false`
 
 Where AreaType is one of:
 
@@ -39,6 +40,8 @@ Where AreaType is one of:
    * `pc-area`
    * `pc-district`
    * `pc-sector`
+
+The `test` flag bypasses all live processing and just uploads a fixed pair of pre-canned reports after a 10s pause. All the other parameter are ignored in this case so long as they are legal.
 
 ## Status response
 
