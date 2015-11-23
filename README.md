@@ -18,6 +18,10 @@ returns status information in JSON for the identified request.
 
 returns a prepared report (may be replaced by S3 endpoint in the future).
 
+    GET /sr-manager/latest-month-available
+
+returns the most recent month for which data is available as a plain string (e.g. "2015-09").
+
 ## Requests
 
 Parameter | Values | Default
