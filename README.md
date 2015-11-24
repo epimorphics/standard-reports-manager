@@ -70,3 +70,5 @@ Example test cases:
     curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=HAMPSHIRE&aggregate=district&period=2015-Q3&report=byPrice"
 
     curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=DEVON&aggregate=district&period=2015-06&age=new&report=byPrice"
+
+    curl -i http://localhost:8080/sr-manager/latest-month-available
