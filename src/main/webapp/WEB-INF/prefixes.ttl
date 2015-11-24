@@ -5,6 +5,7 @@
 @prefix dct:  <http://purl.org/dc/terms/> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix api:  <http://purl.org/linked-data/api/vocab#> .
+@prefix text: <http://jena.apache.org/text#> .
 
 @prefix ppi:  <http://landregistry.data.gov.uk/def/ppi/> .
 @prefix common: <http://landregistry.data.gov.uk/def/common/> .

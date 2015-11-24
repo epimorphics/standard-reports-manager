@@ -24,6 +24,7 @@ SELECT  ?area ?type
     (SUM(?band175) AS  ?count175)
     (SUM(?band200) AS  ?count200)
 WHERE {
+      $_textPattern
       ?transaction 
         ppi:pricePaid ?price;
         ppi:propertyType ?pt ;

@@ -1,5 +1,6 @@
 SELECT (COUNT(?transaction) AS ?count) (SUM(?price) AS ?total) ?area ?type WHERE
     {
+      $_textPattern
       ?transaction 
         ppi:pricePaid ?price;
         ppi:propertyType ?pt;

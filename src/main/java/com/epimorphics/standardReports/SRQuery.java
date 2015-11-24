@@ -19,6 +19,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.XSD;
 
 import com.epimorphics.armlib.BatchRequest;
+import com.epimorphics.sparql.exprs.Call;
 import com.epimorphics.sparql.exprs.Infix;
 import com.epimorphics.sparql.exprs.Op;
 import com.epimorphics.sparql.graphpatterns.Basic;
@@ -28,6 +29,7 @@ import com.epimorphics.sparql.templates.Settings;
 import com.epimorphics.sparql.terms.Filter;
 import com.epimorphics.sparql.terms.Literal;
 import com.epimorphics.sparql.terms.TermAtomic;
+import com.epimorphics.sparql.terms.Text;
 import com.epimorphics.sparql.terms.Triple;
 import com.epimorphics.sparql.terms.URI;
 import com.epimorphics.sparql.terms.Var;
@@ -40,6 +42,8 @@ import com.epimorphics.util.PrefixUtils;
  * @author <a href="mailto:dave@epimorphics.com">Dave Reynolds</a>
  */
 public class SRQuery {
+    public static final String TEXT_PATTERN = "_textPattern";
+    
     protected AbstractSparqlQuery query;
     protected Settings settings = new Settings();
     
@@ -61,19 +65,36 @@ public class SRQuery {
         String ageFilter = params.getFirst(AGE);
         String period = params.getFirst(PERIOD);
         
+        Settings realSettings = new Settings();
+        realSettings.setPrefixMapping( settings.getPrefixMapping() );
+        realSettings.putParam(TEXT_PATTERN, new Text(""));
+        
         AbstractSparqlQuery q = query.copy();
-        SRQuery nq = new SRQuery(q, settings);
+        SRQuery nq = new SRQuery(q, realSettings);
         
         Var addressVar     = new Var("address");
         Var transactionVar = new Var("transaction");
         Var areaVar        = new Var("area");
         
-        Literal area = asLiteral( params.getFirst(AREA) );
+        
+        String  areaStr = params.getFirst(AREA);
+        Literal area = asLiteral( areaStr );
+        
+        Var pc = new Var("pc");
+        boolean boundPostcode = false;
         
         // Inject the area filter
         if ( ! areaType.equals(AT_COUNTRY) ) {
             if (areaType.startsWith(AT_PC_PREFIX)) {
-                // TODO post codes are different and tricky
+                // Text filter for more efficient generation of candidates
+                String pcAreaOrDistrict = areaStr.replaceAll(" .*", "");
+                String textFilter = String.format("?address  text:query (common:postcode '%s*' 3000000).", pcAreaOrDistrict);
+                realSettings.putParam(TEXT_PATTERN, new Text(textFilter));
+                
+                // Exact match on the postcode prefix
+                nq.addPattern( addressVar, new URI(common("postcode")), pc );
+                boundPostcode = true;
+                nq.query.addLaterPattern( new Basic( new Filter( new Infix( pcReplace(pcPattern(areaType)), Op.opEq, area) ) ) );
             } else {
                 nq.addPattern( addressVar, new URI(common(areaType)), area );
             }
@@ -81,7 +102,12 @@ public class SRQuery {
         
         // Inject the aggregation level pattern
         if ( aggregate.startsWith(AT_PC_PREFIX) ) {
-            // TODO post codes are different and tricky
+            if (!boundPostcode) {
+                nq.addPattern( addressVar, new URI(common("postcode")), pc );
+                boundPostcode = true;
+            }
+            nq.query.addEarlyPattern( new Bind( pcReplace(pcPattern(aggregate)), areaVar) );
+            
         } else if (aggregate.equals(AT_NONE)) {
             nq.query.addEarlyPattern( new Bind( area, areaVar) );
         } else {
@@ -124,6 +150,22 @@ public class SRQuery {
             }
         }
         return nq;
+    }
+    
+    protected Call pcReplace(String pattern) {
+        Var pc = new Var("pc");
+        return new Call(Op.fnREPLACE, new Call(Op.fnSTR, pc), asLiteral(pattern), asLiteral("$1"));
+    }
+    
+    protected String pcPattern(String pcType) {
+        if (pcType.equals(PC_AREA)) {
+            return "([A-Z]*).*";
+        } else if (pcType.equals(PC_DISTRICT)) {
+            return "([A-Z0-9]*) .*";
+        } else {
+            // Must be a sector
+            return "([A-Z0-9]* \\\\d).*";
+        }
     }
     
     protected Literal asLiteral(String string) {
