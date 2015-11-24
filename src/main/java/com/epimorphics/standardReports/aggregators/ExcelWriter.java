@@ -27,7 +27,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 /**
  * Utility for creating and writing LR-style excel sheets
  */
-public class ExcelWriter {
+public class ExcelWriter implements SheetWriter {
     XSSFWorkbook wb;
     
     XSSFCellStyle highlightStyle;
@@ -45,19 +45,10 @@ public class ExcelWriter {
     int rownum = 0;
     Row row;
     int colnum = 0;
-    boolean striping = false;
-    boolean stripeOn = true;
 
     public ExcelWriter() {
         wb = new XSSFWorkbook();
         sheet = wb.createSheet("Top sheet");
-        sheet.setColumnWidth(0, 35 * 256);
-        sheet.setColumnWidth(1, 15 * 256);
-        sheet.setColumnWidth(3, 15 * 256);
-        sheet.setColumnWidth(5, 15 * 256);
-        sheet.setColumnWidth(7, 15 * 256);
-        sheet.setColumnWidth(9, 15 * 256);
-        sheet.setColumnWidth(10, 15 * 256);
         
         XSSFColor green = new XSSFColor(new java.awt.Color(0x87, 0xc4, 0x26));
 
@@ -84,6 +75,7 @@ public class ExcelWriter {
         highlightStyle.setFillForegroundColor( green );
         highlightStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         highlightStyle.setFont(bold);
+        highlightStyle.setWrapText(true);
         
         DataFormat df = wb.createDataFormat();
         currencyStyle = wb.createCellStyle();
@@ -104,6 +96,12 @@ public class ExcelWriter {
         boldStyle.setFont(bold);
     }
     
+    public void setColumnWidths(int[] widths) {
+        for (int i = 0; i < widths.length; i++) {
+            sheet.setColumnWidth(i, widths[i]*256);
+        }
+    }
+
     public void addMetaRow(String meta) {
         startRow();
         addCell(meta, boldStyle);
@@ -114,33 +112,54 @@ public class ExcelWriter {
         for (int i = 0; i < headers.length; i++) {
             addCell(headers[i], highlightStyle);
         }
-        striping = true;
     }
     
     public void startRow() {
         row = sheet.createRow(rownum++);
         colnum = 0;
-        if (striping) {
-            stripeOn = !stripeOn;
+    }
+    
+    /** handle string, long, average-accumulator */
+    public void add(Object o, Style style) {
+        add(o, style, false);
+    }
+    
+    /** handle string, long, average-accumulator */
+    public void add(Object o, Style style, boolean stripe) {
+        CellStyle cs = null;
+        CellStyle currCS = null;
+        switch (style) {
+        case Plain:
+            cs = stripe ? normalStripeStyle : normalStyle;
+            currCS = stripe ? currencyStripeStyle : currencyStyle;
+            break;
+        case Bold:
+            cs = stripe ? normalStripeBoldStyle : boldStyle;
+            currCS = stripe ? currencyStripeStyle : currencyStyle;
+            break;
+        case Header:
+            cs = highlightStyle;
+            currCS = currencyHighlightStyle;
+            break;
+        }
+        if (o instanceof Accumulator) {
+            Accumulator a = (Accumulator)o;
+            addCell( a.getAverage().longValue(), currCS );
+            addCell( a.getCount(), cs );
+        } else if (o instanceof Long) {
+            addCell( (long)o, cs );
+        } else {
+            addCell( o.toString(), cs );
         }
     }
     
-    public void addAccumulator(Accumulator a, boolean highlight) {
-        addCell( a.getAverage().longValue(), highlight ? currencyHighlightStyle : (stripeOn ? currencyStripeStyle : currencyStyle) );
-        addCell( a.getCount(), highlight ? highlightStyle : (stripeOn ? normalStripeStyle : normalStyle) );
-    }
-    
-    public void addLabelCell(String value) {
-        addCell(value, stripeOn ? normalStripeBoldStyle : boldStyle);
-    }
-    
-    public void addCell(String value, CellStyle style) {
+    private void addCell(String value, CellStyle style) {
         Cell cell  = row.createCell(colnum++);
         cell.setCellValue(value);
         cell.setCellStyle(style);
     }
     
-    public void addCell(long value, CellStyle style) {
+    private void addCell(long value, CellStyle style) {
         Cell cell  = row.createCell(colnum++);
         cell.setCellValue(value);
         cell.setCellStyle(style);

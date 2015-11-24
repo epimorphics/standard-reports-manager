@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,6 +27,8 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.util.FileManager;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.junit.Test;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 public class TestAggregators {
 
@@ -72,6 +75,18 @@ public class TestAggregators {
     }
     
     @Test
+    public void testByVarAggregator() {
+        ByVarAggregator a = new ByVarAggregator(new String[]{"foo", "bar"});
+        a.add( makeRow("foo", 2, "bar", 3) );
+        a.add( makeRow("foo", 1, "bar", 5) );
+        a.add( makeRow("foo", 3, "bar", 7) );
+        
+        assertEquals(21, a.getTotal().getCount());
+        assertEquals(6, a.getAggregator("foo").getCount());
+        assertEquals(15, a.getAggregator("bar").getCount());
+    }
+    
+    @Test
     public void testPriceCSV() throws IOException {
         AveragePriceAggregator apa = new AveragePriceAggregator();
         apa.add( makeRow("count", 10, "total", 1000000, "area", "foo", "type", "Detached") );
@@ -94,9 +109,52 @@ public class TestAggregators {
         String expected = FileManager.get().readWholeFileAsUTF8("src/test/data/testAPV.csv");
         assertEquals(expected, out.toString());
         
-        // Testing the output is correct is tricky (and currently manual) but at least this checks it runs
-        FileOutputStream fout = new FileOutputStream("target/test.xlsx");
+        // Testing Excel output is correct is tricky (and currently manual) but at least this checks it runs
+        FileOutputStream fout = new FileOutputStream("target/testAverage.xlsx");
         apa.writeAsExcel(fout, request);
+    }
+    
+    @Test
+    public void testBandedAggregator() throws IOException {
+        BandedPriceAggregator bpa = new BandedPriceAggregator();
+        
+        // Reply a canned test query
+        CSVReader reader = new CSVReader( new FileReader("src/test/data/devon-banded.csv") );
+        String[] header = reader.readNext();
+        String[] line = null;
+        while ( (line = reader.readNext()) != null ) {
+            QuerySolutionMap row = new QuerySolutionMap();
+            for (int i = 0; i < header.length; i++) {
+                if (i < 2) {
+                    row.add(header[i], ResourceFactory.createPlainLiteral(line[i]));
+                } else {
+                    long value = Long.parseLong(line[i]);
+                    row.add(header[i], ResourceFactory.createTypedLiteral(value));
+                }
+            }
+            bpa.add(row);
+        }
+        reader.close();
+        
+        MultivaluedMap<String, String> request = new MultivaluedStringMap();
+        request.add("area", "DEVON");
+        request.add("areaType", "County");
+        request.add("aggregate", "none");
+        request.add("age", "any");
+        request.add("period", "2015-07-01");
+        
+        FileOutputStream temp = new FileOutputStream("src/test/data/devon-banded-agg.csv");
+        bpa.writeAsCSV(temp, request);
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        bpa.writeAsCSV(out, request);
+        
+        String expected = FileManager.get().readWholeFileAsUTF8("src/test/data/devon-banded-agg.csv");
+        assertEquals(expected, out.toString());
+        
+        // Testing Excel output is correct is tricky (and currently manual) but at least this checks it runs
+        FileOutputStream fout = new FileOutputStream("target/testBanded.xlsx");
+        bpa.writeAsExcel(fout, request);
     }
     
     public static QuerySolution makeRow(Object...args) {

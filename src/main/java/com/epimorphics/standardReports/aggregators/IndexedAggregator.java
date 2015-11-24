@@ -79,7 +79,7 @@ public class IndexedAggregator implements Aggregator {
     
     public Aggregator getSafeAggregator(String index) {
         Aggregator a = getAggregator(index);
-        return a == null ? new Accumulator() : a;
+        return a == null ? supplier.get() : a;
     }
 
     public void add(QuerySolution row) {

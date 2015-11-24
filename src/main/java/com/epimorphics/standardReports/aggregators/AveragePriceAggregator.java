@@ -19,6 +19,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.jena.query.QuerySolution;
 
+import com.epimorphics.standardReports.aggregators.SheetWriter.Style;
 import com.epimorphics.util.EpiException;
 
 /**
@@ -29,6 +30,7 @@ public class AveragePriceAggregator implements SRAggregator {
     public static final String[] types = new String[]{ "Detached", "Semi-detached", "Terraced", "Flat-maisonette" /*, "other" */ };
     public static final int ROW_LEN = 11;
     public static final String[] HEADER = new String[]{"", "Detached", "Sales", "Semi-det", "Sales", "Terraced", "Sales", "Flat/mais", "Sales", "Overall average", "Total sales"};
+    public static final int[] WIDTHS = new int[]{35, 15, 10, 15, 10, 15, 10, 15, 10, 15, 15};
     
     protected IndexedAggregator aggregator = new IndexedAggregator("area", () -> new IndexedAggregator("type")); 
     protected IndexedAggregator totals = new IndexedAggregator("type");
@@ -48,7 +50,7 @@ public class AveragePriceAggregator implements SRAggregator {
     private IndexedAggregator getAreaAgg(String area) {
         Aggregator a = aggregator.getAggregator(area);
         if (a == null) {
-            throw new EpiException("Internal area, no accumulator for that area");
+            throw new EpiException("Internal error, no accumulator for that area");
         } else {
             return (IndexedAggregator) a;
         }
@@ -66,48 +68,38 @@ public class AveragePriceAggregator implements SRAggregator {
     
     public void writeAsCSV(OutputStream out, MultivaluedMap<String, String> request) throws IOException {
         CSVOutput writer = new CSVOutput(out, ROW_LEN);
-        for (String mrow : makeMetadataRows(request)) {
-            writer.addMetaRow(mrow);
-        }
-        writer.addHeaderRow(HEADER);
-        for (String area : listAreas()) {
-            writer.startRow();
-            writer.add(area);
-            for (String type : types) {
-                writer.add( getAreaTypeAccumulator(area, type) );
-            }
-            writer.add( getAreaTotal(area) );
-        }
-        writer.startRow();
-        writer.add("Total");
-        for (String type : types) {
-            writer.add( totals.getSafeAggregator(type) );
-        }
-        writer.add( totals.getTotal() );
+        format(writer, request);
         writer.close();
     }
     
     public void writeAsExcel(OutputStream out, MultivaluedMap<String, String> request) throws IOException {
         ExcelWriter writer = new ExcelWriter();
+        writer.setColumnWidths(WIDTHS);
+        format(writer, request);
+        writer.write(out);
+    }
+    
+    private void format(SheetWriter writer, MultivaluedMap<String, String> request) {
         for (String mrow : makeMetadataRows(request)) {
             writer.addMetaRow( mrow );
         }
         writer.addHeaderRow( HEADER );
+        boolean stripe = false;
         for (String area : listAreas()) {
             writer.startRow();
-            writer.addLabelCell(area);
+            writer.add(area, Style.Bold, stripe);
             for (String type : types) {
-                writer.addAccumulator(getAreaTypeAccumulator(area, type), false);
+                writer.add(getAreaTypeAccumulator(area, type), Style.Plain, stripe);
             }
-            writer.addAccumulator(getAreaTotal(area), true);
+            writer.add(getAreaTotal(area), Style.Bold, stripe);
+            stripe = !stripe;
         }
         writer.startRow();
-        writer.addCell("Total", writer.highlightStyle);
+        writer.add("Total", Style.Header);
         for (String type : types) {
-            writer.addAccumulator( (Accumulator) totals.getSafeAggregator(type), true);
+            writer.add( totals.getSafeAggregator(type), Style.Header);
         }
-        writer.addAccumulator( totals.getTotal(), true);
-        writer.write(out);
+        writer.add( totals.getTotal(), Style.Header);
     }
     
     private List<String> makeMetadataRows(MultivaluedMap<String, String> request) {

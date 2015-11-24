@@ -22,7 +22,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  * 
  * @author <a href="mailto:dave@epimorphics.com">Dave Reynolds</a>
  */
-public class CSVOutput {
+public class CSVOutput implements SheetWriter {
     protected int rowlen;
     protected CSVWriter writer;
     protected String[] row;
@@ -56,23 +56,32 @@ public class CSVOutput {
         writer.writeNext(header);
     }
     
-    public void add(String value) {
+    /** handle string, long, average-accumulator */
+    public void add(Object o, Style style) {
+        add(o, style, false);
+    }
+    
+    /** handle string, long, average-accumulator */
+    public void add(Object o, Style style, boolean stripe) {
+        if (o instanceof Accumulator) {
+            Accumulator a = (Accumulator)o;
+            addCell( a.getAverage().longValue() );
+            addCell( a.getCount() );
+        } else if (o instanceof Long) {
+            addCell( (long)o );
+        } else {
+            addCell( o.toString() );
+        }
+    }
+    
+    public void addCell(String value) {
         if (col > rowlen - 1) throw new EpiException("Too many elements for row");
         row[col++] = value;
     }
     
-    public void add(Accumulator a) {
-        if (col > rowlen - 2) throw new EpiException("Too many elements for row");
-        row[col++] = Long.toString( a.getAverage().longValue() );
-        row[col++] = Long.toString( a.getCount() );
-    }
-    
-    public void add(Object o) {
-        if (o instanceof Accumulator) {
-            add((Accumulator)o);
-        } else {
-            add(o.toString());
-        }
+    public void addCell(long value) {
+        if (col > rowlen - 1) throw new EpiException("Too many elements for row");
+        row[col++] = Long.toString(value);
     }
     
     public void close() throws IOException {

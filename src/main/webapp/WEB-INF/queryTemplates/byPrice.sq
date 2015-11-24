@@ -2,8 +2,10 @@ SELECT (COUNT(?transaction) AS ?count) (SUM(?price) AS ?total) ?area ?type WHERE
     {
       ?transaction 
         ppi:pricePaid ?price;
-        ppi:propertyType [rdfs:label ?type] ;
+        ppi:propertyType ?pt;
         ppi:transactionDate ?date;
         ppi:propertyAddress ?address .
         $_graphPattern
+        ?pt rdfs:label ?type .
+        FILTER(?pt != common:otherPropertyType)
     } GROUP BY ?area ?type ORDER BY ?area ?type

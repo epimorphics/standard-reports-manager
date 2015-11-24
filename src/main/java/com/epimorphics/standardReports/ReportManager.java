@@ -9,7 +9,9 @@
 
 package com.epimorphics.standardReports;
 
-import static com.epimorphics.standardReports.Constants.*;
+import static com.epimorphics.standardReports.Constants.REPORT;
+import static com.epimorphics.standardReports.Constants.REPORT_BYPRICE;
+import static com.epimorphics.standardReports.Constants.TEST_PARAM;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,12 +27,12 @@ import com.epimorphics.appbase.core.ComponentBase;
 import com.epimorphics.appbase.core.Startup;
 import com.epimorphics.appbase.core.TimerManager;
 import com.epimorphics.appbase.data.SparqlSource;
-import com.epimorphics.appbase.util.TimeStamp;
 import com.epimorphics.armlib.BatchRequest;
 import com.epimorphics.armlib.CacheManager;
 import com.epimorphics.armlib.QueueManager;
 import com.epimorphics.armlib.RequestManager;
 import com.epimorphics.standardReports.aggregators.AveragePriceAggregator;
+import com.epimorphics.standardReports.aggregators.BandedPriceAggregator;
 import com.epimorphics.standardReports.aggregators.SRAggregator;
 import com.epimorphics.util.FileUtil;
 import com.epimorphics.util.NameUtils;
@@ -101,7 +103,6 @@ public class ReportManager extends ComponentBase implements Startup {
                             cache.upload(request, "xlsx", new File( expandFileLocation(MOCK_DATA) + ".xlsx"));
                             
                         } else {
-                            // TODO will need to generalize this for different aggregation types
                             String reportType = request.getParameters().getFirst(REPORT);
                             String queryTemplate =  reportType + ".sq";
                             SRQuery query = srQueryFactory.get(queryTemplate);
@@ -117,7 +118,7 @@ public class ReportManager extends ComponentBase implements Startup {
                                     try {
                                         long start = System.currentTimeMillis();
                                         ResultSet results = source.select( query.getQuery() );
-                                        SRAggregator agg = reportType.equals(REPORT_BYPRICE) ? new AveragePriceAggregator() : /* TODO */ null;
+                                        SRAggregator agg = reportType.equals(REPORT_BYPRICE) ? new AveragePriceAggregator() : new BandedPriceAggregator();
                                         while (results.hasNext()) {
                                             agg.add( results.next() );
                                         }

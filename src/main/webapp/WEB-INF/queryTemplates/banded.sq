@@ -10,6 +10,7 @@ SELECT  ?area ?type
     (SUM(  ?band8) AS    ?count8)
     (SUM(  ?band9) AS    ?count9)
     (SUM( ?band10) AS   ?count10)
+    (SUM( ?band12) AS   ?count12)
     (SUM( ?band15) AS   ?count15)
     (SUM( ?band20) AS   ?count20)
     (SUM( ?band30) AS   ?count30)
@@ -25,10 +26,12 @@ SELECT  ?area ?type
 WHERE {
       ?transaction 
         ppi:pricePaid ?price;
-        ppi:propertyType [rdfs:label ?type] ;
+        ppi:propertyType ?pt ;
         ppi:transactionDate ?date;
         ppi:propertyAddress ?address .
         $_graphPattern
+        ?pt rdfs:label ?type .
+        FILTER(?pt != common:otherPropertyType)
         BIND (IF(?price  <  10000, 1, 0)                      AS ?band0)
         BIND (IF(?price >=  10000 && ?price <=   20000, 1, 0) AS ?band1)
         BIND (IF(?price >   20000 && ?price <=   30000, 1, 0) AS ?band2)
@@ -40,6 +43,7 @@ WHERE {
         BIND (IF(?price >   80000 && ?price <=   90000, 1, 0) AS ?band8)
         BIND (IF(?price >   90000 && ?price <=  100000, 1, 0) AS ?band9)
         BIND (IF(?price >  100000 && ?price <=  120000, 1, 0) AS ?band10)
+        BIND (IF(?price >  120000 && ?price <=  150000, 1, 0) AS ?band12)
         BIND (IF(?price >  150000 && ?price <=  200000, 1, 0) AS ?band15)
         BIND (IF(?price >  200000 && ?price <=  300000, 1, 0) AS ?band20)
         BIND (IF(?price >  300000 && ?price <=  400000, 1, 0) AS ?band30)
