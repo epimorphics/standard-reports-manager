@@ -196,7 +196,6 @@ public class SRQuery {
     public String getQuery() {
         String qstr = query.toSparqlSelect( settings );
         qstr = PrefixUtils.expandQuery(qstr, settings.getPrefixMapping());
-        System.out.println("Debug: query = \n" + qstr);
         return qstr;
     }
 }

@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.util.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,7 @@ public class ReportManager extends ComponentBase implements Startup {
     protected RequestManager requestManager;
     protected SRQueryFactory srQueryFactory;
     protected File  workDir;
+    protected File  templateDir;
 
     public RequestManager getRequestManager() {
         return requestManager;
@@ -62,7 +64,9 @@ public class ReportManager extends ComponentBase implements Startup {
     }
     
     public void setTemplateDir(String templateDir) {
-        srQueryFactory = new SRQueryFactory( expandFileLocation(templateDir) );
+        String td = expandFileLocation(templateDir);
+        srQueryFactory = new SRQueryFactory( td );
+        this.templateDir = new File(td);
     }
     
     public void setWorkDir(String workDir) {
@@ -75,6 +79,14 @@ public class ReportManager extends ComponentBase implements Startup {
     public void startup(App app) {
         super.startup(app);
         TimerManager.get().schedule(new RequestProcessor(), 1, TimeUnit.SECONDS);
+    }
+
+    public SRQuery getQuery(String templateName) {
+        return srQueryFactory.get(templateName);
+    }
+
+    public String getRawQuery(String templateName) {
+        return FileManager.get().readWholeFileAsUTF8( new File(templateDir, templateName).getPath() );
     }
     
     public class RequestProcessor implements Runnable {
@@ -117,7 +129,9 @@ public class ReportManager extends ComponentBase implements Startup {
                                 for (int retry = 0; retry < RETRY_LIMIT && !succeeded; retry++) {
                                     try {
                                         long start = System.currentTimeMillis();
-                                        ResultSet results = source.select( query.getQuery() );
+                                        String queryStr = query.getQuery();
+                                        log.info("Running query: " + queryStr);
+                                        ResultSet results = source.select( queryStr );
                                         SRAggregator agg = reportType.equals(REPORT_BYPRICE) ? new AveragePriceAggregator() : new BandedPriceAggregator();
                                         while (results.hasNext()) {
                                             agg.add( results.next() );

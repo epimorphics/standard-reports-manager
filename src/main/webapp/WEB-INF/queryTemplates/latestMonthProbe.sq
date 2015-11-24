@@ -6,5 +6,5 @@ ASK {
     UNION
       {[] ppi:transactionDate "?second"^^xsd:date.}
     UNION
-      {[] ppi:transactionDate "?thir4d"^^xsd:date.}
+      {[] ppi:transactionDate "?third"^^xsd:date.}
 } 

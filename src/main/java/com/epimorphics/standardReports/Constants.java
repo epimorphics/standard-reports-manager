@@ -21,6 +21,8 @@ public class Constants {
     public static final String STICKY    = "sticky";
     
     public static final String AT_COUNTRY = "country";
+    public static final String AT_COUNTY = "county";
+    public static final String AT_REGION = "region";
     public static final String AT_NONE    = "none";
     public static final String AT_PC_PREFIX = "pc-";
     public static final String PC_AREA      = "pc-area";

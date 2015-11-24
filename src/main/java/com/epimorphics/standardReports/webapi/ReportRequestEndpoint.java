@@ -68,8 +68,10 @@ public class ReportRequestEndpoint extends SREndpointBase {
         validator.checkRequest(request);
         StringBuffer keyBuf = new StringBuffer();
         keyBuf.append( request.getFirst(REPORT) );
-        keyBuf.append( "-" + request.getFirst(AREA_TYPE) );
-        keyBuf.append( "-" + request.getFirst(AREA).replace(" ", "_"));
+        String areaType = request.getFirst(AREA_TYPE);
+        keyBuf.append( "-" + areaType );
+        String area = request.getFirst(AREA);
+        keyBuf.append( "-" + area.replace(" ", "_"));
         keyBuf.append( "-by-" + request.getFirst(AGGREGATE) );
         keyBuf.append( "-" + request.getFirst(AGE) );
         keyBuf.append( "-" + request.getFirst(PERIOD) );
@@ -77,7 +79,19 @@ public class ReportRequestEndpoint extends SREndpointBase {
         
         br.setSticky( request.getFirst(STICKY).equalsIgnoreCase("true"));
         
-        // TODO set estimated time based on at least area type
+        if (areaType.equals(AT_COUNTRY)) {
+            br.setEstimatedTime(1000 * 60 * 30);
+        } else if (areaType.equals(AT_REGION)) {
+            br.setEstimatedTime(1000 * 60 * 10);
+        } else if (areaType.equals(AT_COUNTY)){
+            if (area.contains("LONDON")) {
+                br.setEstimatedTime(1000 * 60 * 10);
+            } else {
+                br.setEstimatedTime(1000 * 30);
+            }
+        } else {
+            br.setEstimatedTime(1000 * 10);
+        }
         
         return br;
     }
