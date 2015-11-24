@@ -1,0 +1,10 @@
+PREFIX ppi: <http://landregistry.data.gov.uk/def/ppi/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+ASK {      
+      {[] ppi:transactionDate "?first"^^xsd:date.}
+    UNION
+      {[] ppi:transactionDate "?second"^^xsd:date.}
+    UNION
+      {[] ppi:transactionDate "?thir4d"^^xsd:date.}
+} 
