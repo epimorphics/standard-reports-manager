@@ -33,7 +33,7 @@ public class Constants {
     public static final String AGE_NEW = "new";
     public static final String AGE_ANY = "any";
     
-    public static final String REPORT_BYPRICE = "byPrice";
+    public static final String REPORT_BYPRICE = "avgPrice";
     public static final String REPORT_BANDED = "banded";
     
     public static final String TEST_PARAM = "test";

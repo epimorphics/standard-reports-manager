@@ -31,7 +31,7 @@ Parameter | Values | Default
 `aggregate` | AreaType or `none` | `none`
 `age` | `new` `old` `any` | `any`
 `period` | 2015   2015-Q1  2015-03 |
-`report` | `byPrice` `banded` | `byPrice`
+`report` | `avgPrice` `banded` | `avgPrice`
 `sticky` | `true` `false` | `true`
 `test` | `true` `false` | `false`
 
@@ -67,8 +67,8 @@ To run locally but point queries at the dev server set up a local tunnel:
 
 Example test cases:
 
-    curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=HAMPSHIRE&aggregate=district&period=2015-Q3&report=byPrice"
+    curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=HAMPSHIRE&aggregate=district&period=2015-Q3&report=avgPrice"
 
-    curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=DEVON&aggregate=district&period=2015-06&age=new&report=byPrice"
+    curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=DEVON&aggregate=district&period=2015-06&age=new&report=avgPrice"
 
     curl -i http://localhost:8080/sr-manager/latest-month-available
