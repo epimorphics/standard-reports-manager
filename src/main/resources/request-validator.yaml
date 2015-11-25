@@ -1,4 +1,4 @@
-areaType  : "country|region|county|district|pc-area|pc-district|pc-sector"
+areaType  : "country|region|county|district|pcArea|pcDistrict|pcSector"
 area      : true
 aggregate : { regex: "country|region|county|district|none|pcArea|pcDistrict|pcSector", default: "none" }
 age       : { regex : "old|new|any", default : "any" }
