@@ -1,6 +1,6 @@
 areaType  : "country|region|county|district|pc-area|pc-district|pc-sector"
 area      : true
-aggregate : { regex: "country|region|county|district|none|pc-area|pc-district|pc-sector", default: "none" }
+aggregate : { regex: "country|region|county|district|none|pcArea|pcDistrict|pcSector", default: "none" }
 age       : { regex : "old|new|any", default : "any" }
 period    : "\\d\\d\\d\\d|\\d\\d\\d\\d-Q\\d|\\d\\d\\d\\d-\\d\\d"
 report    : { regex : "byPrice|banded", default : "byPrice" }

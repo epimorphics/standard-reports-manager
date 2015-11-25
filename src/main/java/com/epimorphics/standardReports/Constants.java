@@ -24,10 +24,10 @@ public class Constants {
     public static final String AT_COUNTY = "county";
     public static final String AT_REGION = "region";
     public static final String AT_NONE    = "none";
-    public static final String AT_PC_PREFIX = "pc-";
-    public static final String PC_AREA      = "pc-area";
-    public static final String PC_DISTRICT  = "pc-district";
-    public static final String PC_SECTOR    = "pc-sector";
+    public static final String AT_PC_PREFIX = "pc";
+    public static final String PC_AREA      = "pcArea";
+    public static final String PC_DISTRICT  = "pcDistrict";
+    public static final String PC_SECTOR    = "pcSector";
     
     public static final String AGE_OLD = "old";
     public static final String AGE_NEW = "new";

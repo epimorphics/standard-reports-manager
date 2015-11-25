@@ -41,9 +41,9 @@ Where AreaType is one of:
    * `region`
    * `county`
    * `district`
-   * `pc-area`
-   * `pc-district`
-   * `pc-sector`
+   * `pcArea`
+   * `pcDistrict`
+   * `pcSector`
 
 The `test` flag bypasses all live processing and just uploads a fixed pair of pre-canned reports after a 10s pause. All the other parameter are ignored in this case so long as they are legal.
 
