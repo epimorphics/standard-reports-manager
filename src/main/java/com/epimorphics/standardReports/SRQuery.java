@@ -95,6 +95,10 @@ public class SRQuery {
                 nq.addPattern( addressVar, new URI(common("postcode")), pc );
                 boundPostcode = true;
                 nq.query.addLaterPattern( new Basic( new Filter( new Infix( pcReplace(pcPattern(areaType)), Op.opEq, area) ) ) );
+            } else if ( areaType.equals(AT_REGION)) {
+                String fragmentName = "region_" + areaStr.replace(" ", "_") + ".sq";
+                realSettings.putParam(TEXT_PATTERN, new Text( SRQueryFactory.get().getRaw(fragmentName))); 
+                nq.addPattern( addressVar, new URI(common("county")), new Var("county") );
             } else {
                 nq.addPattern( addressVar, new URI(common(areaType)), area );
             }
@@ -110,6 +114,8 @@ public class SRQuery {
             
         } else if (aggregate.equals(AT_NONE)) {
             nq.query.addEarlyPattern( new Bind( area, areaVar) );
+        } else if (aggregate.equals(AT_REGION)) {
+            nq.query.addEarlyPattern(new Basic( new Text( SRQueryFactory.get().getRaw("regionAggregate.sq" ) ) ));
         } else {
             nq.addPattern( addressVar, new URI(common(aggregate)), areaVar );
         }

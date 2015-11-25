@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.epimorphics.appbase.core.AppConfig;
 import com.epimorphics.appbase.data.SparqlSource;
-import com.epimorphics.standardReports.ReportManager;
+import com.epimorphics.standardReports.SRQueryFactory;
 
 @Path("latest-month-available")
 public class LatestMonthAvailable extends SREndpointBase {
@@ -60,13 +60,9 @@ public class LatestMonthAvailable extends SREndpointBase {
             log.error("Fatal configuration error: can't find source to query from");
             return true;
         }
-        ReportManager reportManager = AppConfig.getApp().getA(ReportManager.class);
-        if (reportManager == null){
-            log.error("Fatal configuration error: can't find report manager");
-            return true;
-        }
+
         // Probe tests 3 days in the month so as to be sure to avoid weekends or other quiet days
-        String probeQuery = reportManager.getRawQuery("latestMonthProbe.sq");
+        String probeQuery = SRQueryFactory.get().getRaw("latestMonthProbe.sq");
         probeQuery = probeQuery.replace("?first", probe.format(DateTimeFormatter.ISO_LOCAL_DATE));
         LocalDate second = probe.plus(1, ChronoUnit.DAYS);
         probeQuery = probeQuery.replace("?second", second.format(DateTimeFormatter.ISO_LOCAL_DATE));

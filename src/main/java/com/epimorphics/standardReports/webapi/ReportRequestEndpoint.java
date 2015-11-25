@@ -80,17 +80,17 @@ public class ReportRequestEndpoint extends SREndpointBase {
         br.setSticky( request.getFirst(STICKY).equalsIgnoreCase("true"));
         
         if (areaType.equals(AT_COUNTRY)) {
-            br.setEstimatedTime(1000 * 60 * 30);
+            br.setEstimatedTime(1000 * 60 * 15);
         } else if (areaType.equals(AT_REGION)) {
-            br.setEstimatedTime(1000 * 60 * 10);
+            br.setEstimatedTime(1000 * 60 * 4);
         } else if (areaType.equals(AT_COUNTY)){
             if (area.contains("LONDON")) {
-                br.setEstimatedTime(1000 * 60 * 10);
+                br.setEstimatedTime(1000 * 60 * 5);
             } else {
                 br.setEstimatedTime(1000 * 30);
             }
         } else {
-            br.setEstimatedTime(1000 * 10);
+            br.setEstimatedTime(1000 * 15);
         }
         
         return br;

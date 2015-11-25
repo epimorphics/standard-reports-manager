@@ -15,6 +15,8 @@ import java.util.Map;
 
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.util.FileManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.epimorphics.simpleAPI.core.API;
 
@@ -24,12 +26,22 @@ import com.epimorphics.simpleAPI.core.API;
  * @author <a href="mailto:dave@epimorphics.com">Dave Reynolds</a>
  */
 public class SRQueryFactory {
+    static Logger log = LoggerFactory.getLogger( SRQueryFactory.class );
+    
+    public static SRQueryFactory theSRQueryFactory;
+    
     protected File templateDir;
     protected PrefixMapping prefixes;
     protected Map<String, SRQuery> queries = new HashMap<>();
+    protected Map<String, String> rawQueries = new HashMap<>();
     
     public SRQueryFactory(String templateDir) {
         this.templateDir = new File( templateDir );
+        theSRQueryFactory = this;
+    }
+    
+    public static SRQueryFactory get() {
+        return theSRQueryFactory;
     }
     
     public PrefixMapping getPrefixes() {
@@ -39,13 +51,28 @@ public class SRQueryFactory {
         return prefixes;
     }
     
+    public String getRaw(String templateName) {
+        String template = rawQueries.get(templateName);
+        if (template == null) {
+            String fname = new File(templateDir, templateName).getPath();
+            try {
+                template = FileManager.get().readWholeFileAsUTF8( fname );
+                rawQueries.put(templateName, template);
+            } catch (Exception e) {
+                log.error("Could not locate template: " + templateName);
+            }
+        }
+        return template;
+    }
+    
     public SRQuery get(String templateName) {
         SRQuery query = queries.get(templateName);
         if (query == null) {
-            String fname = new File(templateDir, templateName).getPath();
-            String qstr = FileManager.get().readWholeFileAsUTF8( fname );
-            query = new SRQuery(qstr, getPrefixes());
-            queries.put(templateName, query);
+            String template = getRaw(templateName);
+            if (template != null){
+                query = new SRQuery(template, getPrefixes());
+                queries.put(templateName, query);
+            }
         }
         return query;
     }
