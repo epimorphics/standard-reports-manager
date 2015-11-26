@@ -11,6 +11,8 @@ package com.epimorphics.standardReports.webapi;
 
 import static com.epimorphics.standardReports.Constants.*;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,8 +28,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.jena.atlas.json.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
+import com.epimorphics.appbase.core.AppConfig;
 import com.epimorphics.appbase.webapi.WebApiException;
 import com.epimorphics.armlib.BatchRequest;
 import com.epimorphics.armlib.BatchStatus;
@@ -38,6 +43,7 @@ import com.epimorphics.simpleAPI.requests.RequestCheck;
 
 @Path("report-request")
 public class ReportRequestEndpoint extends SREndpointBase {
+    static Logger log = LoggerFactory.getLogger( ReportRequestEndpoint.class );
     
     public static final String URL_KEY   = "url";
     public static final String XLS_URL_KEY   = "urlXlsx";
@@ -45,9 +51,14 @@ public class ReportRequestEndpoint extends SREndpointBase {
     protected static RequestCheck validator;
     
     static {
-        InputStream specIS = ClassLoader.class.getResourceAsStream("/request-validator.yaml");
-        JsonObject spec = JsonUtil.asJson( new Yaml().load( specIS ) ).getAsObject();
-        validator = RequestCheck.fromJson(spec);
+        try {
+            InputStream specIS = new FileInputStream( AppConfig.getAppConfig().expandFileLocation("{webapp}/WEB-INF/request-validator.yaml") );
+//        InputStream specIS = ClassLoader.class.getResourceAsStream("/request-validator.yaml");
+            JsonObject spec = JsonUtil.asJson( new Yaml().load( specIS ) ).getAsObject();
+            validator = RequestCheck.fromJson(spec);
+        } catch (IOException e) {
+            log.error("Fatal configuration error: could not locate request-validator.yaml");
+        }
     }
     
     @POST
@@ -65,7 +76,7 @@ public class ReportRequestEndpoint extends SREndpointBase {
     
     public static BatchRequest makeBatchRequest(Request request) {
         BatchRequest br = new BatchRequest("report-request", request.getParametersMap());
-        validator.checkRequest(request);
+        if (validator != null) validator.checkRequest(request);
         StringBuffer keyBuf = new StringBuffer();
         keyBuf.append( request.getFirst(REPORT) );
         String areaType = request.getFirst(AREA_TYPE);
