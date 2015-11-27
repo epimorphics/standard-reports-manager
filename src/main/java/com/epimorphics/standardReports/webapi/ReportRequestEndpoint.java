@@ -118,8 +118,12 @@ public class ReportRequestEndpoint extends SREndpointBase {
         JsonObject statusj = status.asJson();
         // Fix up the URLs for the dual result versions
         if (statusj.hasKey(URL_KEY)) {
-            String url = uriInfo.getBaseUri() + statusj.get(URL_KEY).getAsString().value();
-            statusj.put(URL_KEY, url);
+            String url = statusj.get(URL_KEY).getAsString().value();
+            if (! (url.startsWith("http://") || url.startsWith("https://")) ) {
+                // Fix up relative URIs
+                url = uriInfo.getBaseUri() + url;
+                statusj.put(URL_KEY, url);
+            }
             statusj.put(XLS_URL_KEY, url.replaceAll("\\.csv$", ".xlsx"));
         }
         return statusj;
