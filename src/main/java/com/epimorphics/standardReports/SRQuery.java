@@ -24,7 +24,7 @@ import com.epimorphics.sparql.exprs.Infix;
 import com.epimorphics.sparql.exprs.Op;
 import com.epimorphics.sparql.graphpatterns.Basic;
 import com.epimorphics.sparql.graphpatterns.Bind;
-import com.epimorphics.sparql.query.AbstractSparqlQuery;
+import com.epimorphics.sparql.query.QueryShape;
 import com.epimorphics.sparql.templates.Settings;
 import com.epimorphics.sparql.terms.Filter;
 import com.epimorphics.sparql.terms.Literal;
@@ -44,16 +44,16 @@ import com.epimorphics.util.PrefixUtils;
 public class SRQuery {
     public static final String TEXT_PATTERN = "_textPattern";
     
-    protected AbstractSparqlQuery query;
+    protected QueryShape query;
     protected Settings settings = new Settings();
     
     public SRQuery(String template, PrefixMapping prefixes) {
-        query = new AbstractSparqlQuery();
+        query = new QueryShape();
         query.setTemplate(template);
         settings.setPrefixMapping( prefixes );
     }
     
-    protected SRQuery(AbstractSparqlQuery query, Settings settings) {
+    protected SRQuery(QueryShape query, Settings settings) {
         this.query = query;
         this.settings = settings;
     }
@@ -69,7 +69,7 @@ public class SRQuery {
         realSettings.setPrefixMapping( settings.getPrefixMapping() );
         realSettings.putParam(TEXT_PATTERN, new Text(""));
         
-        AbstractSparqlQuery q = query.copy();
+        QueryShape q = query.copy();
         SRQuery nq = new SRQuery(q, realSettings);
         
         Var addressVar     = new Var("address");
