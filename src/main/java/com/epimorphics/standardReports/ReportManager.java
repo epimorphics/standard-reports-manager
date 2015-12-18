@@ -54,6 +54,7 @@ public class ReportManager extends ComponentBase implements Startup {
     protected SRQueryFactory srQueryFactory;
     protected File  workDir;
     protected File  templateDir;
+    protected long  recordRentionPeriod = 30;
 
     public RequestManager getRequestManager() {
         return requestManager;
@@ -61,6 +62,17 @@ public class ReportManager extends ComponentBase implements Startup {
 
     public void setRequestManager(RequestManager requestManager) {
         this.requestManager = requestManager;
+    }
+    
+    /**
+     * Time for which to keep old completion record (in days)
+     */
+    public long getRecordRetentionPeriod() {
+        return recordRentionPeriod;
+    }
+    
+    public void setRecordRetentionPeriod(long recordRetentionPeriod) {
+        this.recordRentionPeriod = recordRetentionPeriod;
     }
     
     public void setTemplateDir(String templateDir) {
