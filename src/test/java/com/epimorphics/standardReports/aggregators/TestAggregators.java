@@ -107,7 +107,7 @@ public class TestAggregators {
         apa.writeAsCSV(out, request);
         
         String expected = FileManager.get().readWholeFileAsUTF8("src/test/data/testAPV.csv");
-        assertEquals(expected, out.toString());
+        assertEquals(expected, filterCreatedMetadata( out.toString() ));
         
         // Testing Excel output is correct is tricky (and currently manual) but at least this checks it runs
         FileOutputStream fout = new FileOutputStream("target/testAverage.xlsx");
@@ -143,18 +143,29 @@ public class TestAggregators {
         request.add("age", "any");
         request.add("period", "2015-07-01");
         
-        FileOutputStream temp = new FileOutputStream("src/test/data/devon-banded-agg.csv");
-        bpa.writeAsCSV(temp, request);
+        //FileOutputStream temp = new FileOutputStream("src/test/data/devon-banded-agg.csv");
+        //bpa.writeAsCSV(temp, request);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         bpa.writeAsCSV(out, request);
         
         String expected = FileManager.get().readWholeFileAsUTF8("src/test/data/devon-banded-agg.csv");
-        assertEquals(expected, out.toString());
+        assertEquals(expected, filterCreatedMetadata( out.toString() ));
         
         // Testing Excel output is correct is tricky (and currently manual) but at least this checks it runs
         FileOutputStream fout = new FileOutputStream("target/testBanded.xlsx");
         bpa.writeAsExcel(fout, request);
+    }
+    
+    private String filterCreatedMetadata(String result) {
+        StringBuffer buf = new StringBuffer();
+        for (String line : result.split("\n")) {
+            if ( ! line.startsWith("\"Report created on:") ) {
+                buf.append(line);
+                buf.append("\n");
+            }
+        }
+        return buf.toString();
     }
     
     public static QuerySolution makeRow(Object...args) {

@@ -9,10 +9,6 @@
 
 package com.epimorphics.standardReports.aggregators;
 
-import static com.epimorphics.standardReports.Constants.*;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -26,14 +22,19 @@ import com.epimorphics.util.EpiException;
  * Accumulates data for average prices by area and type, then provides csv and Excel serializations.
  * Non-streaming, data sizes don't warrant it.
  */
-public class AveragePriceAggregator implements SRAggregator {
-    public static final String[] types = new String[]{ "Detached", "Semi-detached", "Terraced", "Flat-maisonette" /*, "other" */ };
-    public static final int ROW_LEN = 11;
-    public static final String[] HEADER = new String[]{"", "Detached", "Sales", "Semi-det", "Sales", "Terraced", "Sales", "Flat/mais", "Sales", "Overall average", "Total sales"};
-    public static final int[] WIDTHS = new int[]{35, 15, 10, 15, 10, 15, 10, 15, 10, 15, 15};
+public class AveragePriceAggregator extends BaseAggregator implements SRAggregator {
+    protected static final String[] types = new String[]{ "Detached", "Semi-detached", "Terraced", "Flat-maisonette" /*, "other" */ };
+    protected static final int ROW_LEN = 11;
+    protected static final String[] HEADER = new String[]{"", "Detached", "Sales", "Semi-det", "Sales", "Terraced", "Sales", "Flat/mais", "Sales", "Overall average", "Total sales"};
+    protected static final int[] WIDTHS = new int[]{35, 15, 10, 15, 10, 15, 10, 15, 10, 15, 15};
     
     protected IndexedAggregator aggregator = new IndexedAggregator("area", () -> new IndexedAggregator("type")); 
     protected IndexedAggregator totals = new IndexedAggregator("type");
+    
+    public AveragePriceAggregator() {
+        row_len = ROW_LEN;
+        widths = WIDTHS;
+    }
     
     public Accumulator getTotal() {
         return aggregator.getTotal();
@@ -66,21 +67,9 @@ public class AveragePriceAggregator implements SRAggregator {
         totals.add(row);
     }
     
-    public void writeAsCSV(OutputStream out, MultivaluedMap<String, String> request) throws IOException {
-        CSVOutput writer = new CSVOutput(out, ROW_LEN);
-        format(writer, request);
-        writer.close();
-    }
-    
-    public void writeAsExcel(OutputStream out, MultivaluedMap<String, String> request) throws IOException {
-        ExcelWriter writer = new ExcelWriter();
-        writer.setColumnWidths(WIDTHS);
-        format(writer, request);
-        writer.write(out);
-    }
-    
-    private void format(SheetWriter writer, MultivaluedMap<String, String> request) {
-        for (String mrow : makeMetadataRows(request)) {
+    @Override
+    protected void format(SheetWriter writer, MultivaluedMap<String, String> request) {
+        for (String mrow : makeMetadataRows("Average Prices and Volumes of Sales", request)) {
             writer.addMetaRow( mrow );
         }
         writer.addHeaderRow( HEADER );
@@ -100,20 +89,6 @@ public class AveragePriceAggregator implements SRAggregator {
             writer.add( totals.getSafeAggregator(type), Style.Header);
         }
         writer.add( totals.getTotal(), Style.Header);
-    }
-    
-    private List<String> makeMetadataRows(MultivaluedMap<String, String> request) {
-        List<String> metadata = new ArrayList<>();
-        metadata.add("Average Prices and Volumes of Sales");
-        String aggregate = request.getFirst(AGGREGATE);
-        if (aggregate.equals(AT_NONE)) {
-            metadata.add( String.format("For %s - %s", request.getFirst(AREA_TYPE), request.getFirst(AREA)) );
-        } else {
-            metadata.add( String.format("By %s for %s - %s", aggregate, request.getFirst(AREA_TYPE), request.getFirst(AREA)) );
-        }
-        metadata.add( request.getFirst(PERIOD) );
-        metadata.add( "Age: " + request.getFirst(AGE) );
-        return metadata;
     }
 
 }
