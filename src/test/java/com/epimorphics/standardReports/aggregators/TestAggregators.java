@@ -118,7 +118,7 @@ public class TestAggregators {
     public void testBandedAggregator() throws IOException {
         BandedPriceAggregator bpa = new BandedPriceAggregator();
         
-        // Reply a canned test query
+        // Replay a canned test query
         CSVReader reader = new CSVReader( new FileReader("src/test/data/devon-banded.csv") );
         String[] header = reader.readNext();
         String[] line = null;
@@ -139,7 +139,7 @@ public class TestAggregators {
         MultivaluedMap<String, String> request = new MultivaluedStringMap();
         request.add("area", "DEVON");
         request.add("areaType", "County");
-        request.add("aggregate", "none");
+        request.add("aggregate", "district");
         request.add("age", "any");
         request.add("period", "2015-07-01");
         
