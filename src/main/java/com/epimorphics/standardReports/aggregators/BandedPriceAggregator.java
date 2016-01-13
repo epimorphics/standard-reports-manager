@@ -15,6 +15,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.jena.query.QuerySolution;
 
+import com.epimorphics.standardReports.Constants;
 import com.epimorphics.standardReports.aggregators.SheetWriter.Style;
 import com.epimorphics.util.EpiException;
 
@@ -104,13 +105,15 @@ public class BandedPriceAggregator extends BaseAggregator implements SRAggregato
             writer.add( bands.getTotal().getCount(), Style.Header );
         }
         // Overall total
-        writer.startRow();
-        writer.add("Total", Style.Header);
-        writer.add("", Style.Header);
-        for (String band : bandVars) {
-            writer.add( totals.getAggregator(band).getCount(), Style.Header );
+        if ( ! Constants.AT_NONE.equals( request.getFirst(Constants.AGGREGATE) ) ) {
+            writer.startRow();
+            writer.add("Total", Style.Header);
+            writer.add("", Style.Header);
+            for (String band : bandVars) {
+                writer.add( totals.getAggregator(band).getCount(), Style.Header );
+            }
+            writer.add( totals.getTotal().getCount(), Style.Header );
         }
-        writer.add( totals.getTotal().getCount(), Style.Header );
     }
     
 }
