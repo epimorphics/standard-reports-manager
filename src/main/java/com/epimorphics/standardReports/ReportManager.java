@@ -166,11 +166,11 @@ public class ReportManager extends ComponentBase implements Startup {
     
                                     } catch (Exception e) {
                                         if (retry < RETRY_LIMIT - 1) {
-                                            log.error("Request " + request.getKey() + " failed" , e);
-                                            queue.failRequest( request.getKey() );
-                                        } else {
                                             log.warn("Request " + request.getKey() + " failed, retrying after 10s" , e);
                                             Thread.sleep(10000);
+                                        } else {
+                                            log.error("Request " + request.getKey() + " failed" , e);
+                                            queue.failRequest( request.getKey() );
                                         }
                                     }
                                 }
