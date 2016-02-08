@@ -72,3 +72,6 @@ Example test cases:
     curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=DEVON&aggregate=district&period=2015-06&age=new&report=avgPrice"
 
     curl -i http://localhost:8080/sr-manager/latest-month-available
+
+    # Large result test case
+    curl -i -X POST "http://localhost:8080/sr-manager/report-request?area=EW&period=2015&areaType=country&report=banded&age=any&aggregate=pcSector"
