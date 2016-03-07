@@ -29,10 +29,11 @@ WHERE {
         ppi:pricePaid ?price;
         ppi:propertyType ?pt ;
         ppi:transactionDate ?date;
-        ppi:propertyAddress ?address .
+        ppi:propertyAddress ?address ;
+        ppi:transactionCategory ?category .
         $_graphPattern
         ?pt rdfs:label ?type .
-        FILTER(?pt != common:otherPropertyType)
+        FILTER(?pt != common:otherPropertyType && ?category != ppi:additionalPricePaidTransaction) 
         BIND (IF(?price  <  10000, 1, 0)                      AS ?band0)
         BIND (IF(?price >=  10000 && ?price <=   20000, 1, 0) AS ?band1)
         BIND (IF(?price >   20000 && ?price <=   30000, 1, 0) AS ?band2)
