@@ -25,10 +25,17 @@ import com.epimorphics.util.EpiException;
  */
 public class BandedPriceAggregator extends BaseAggregator implements SRAggregator {
     protected static final String[] types = new String[]{ "Detached", "Semi-detached", "Terraced", "Flat-maisonette" /*, "other" */ };
-    protected static final String[] bandVars = new String[]{ "count0",   "count1",   "count2",   "count3",   "count4",   "count5",   "count6",   "count7",   "count8",   "count9",  "count10",  "count12",  "count15",  "count20",  "count30",  "count40",  "count50",  "count60",  "count80", "count100", "count125", "count150", "count175", "count200"};
+    protected static final String[] bandVars = new String[]{ "count0",   "count1",   "count2",   "count3",   "count4",   "count5",   "count6",   
+            "count7",   "count8",   "count9",   "count10",  "count12",  "count15",  "count20",  "count30",  "count40",  "count50",  "count60", 
+            "count80", "count100", "count125",  "count150", "count175", "count200", "count500", "count1000", "count2000"};
     protected static final int ROW_LEN = bandVars.length + 3;
-    protected static final String[] HEADER = new String[]{"Area", "Type", "Under 10,000",  "10,000 - 20,000",  "20,001 - 30,000", "30,001 - 40,000", "40,001 - 50,000", "50,001 - 60,000",  "60,001 - 70,000", "70,001 - 80,000", "80,001 - 90,000", "90,001 - 100,000",    "100,001 - 120,000",   "120,001 - 150,000",   "150,001 - 200,000",   "200,001 - 300,000",   "300,001 - 400,000",   "400,001 - 500,000",   "500,001 - 600,000",   "600,001 - 800,000",   "800,001 - 1,000,000",  "1,000,001 - 1,250,000",    "1,250,001 - 1,500,000",   "1,500,001 - 1,750,000",   "1,750,001 - 2,000,000",   "over 2,000,000",  "Total"};
-    protected int[] WIDTHS = new int[]{35, 20, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12};
+    protected static final String[] HEADER = new String[]{"Area", "Type", "Under 10,000",  "10,000 - 20,000",  "20,001 - 30,000", "30,001 - 40,000", 
+            "40,001 - 50,000", "50,001 - 60,000",  "60,001 - 70,000", "70,001 - 80,000", "80,001 - 90,000", "90,001 - 100,000", 
+            "100,001 - 120,000",   "120,001 - 150,000",   "150,001 - 200,000",   "200,001 - 300,000",   "300,001 - 400,000",   "400,001 - 500,000",   
+            "500,001 - 600,000",   "600,001 - 800,000",   "800,001 - 1,000,000",  "1,000,001 - 1,250,000",    "1,250,001 - 1,500,000",   
+            "1,500,001 - 1,750,000",   "1,750,001 - 2,000,000",  "2,000,001 - 5,000,000", "5,000,001 - 10,000,000", "10,000,001 - 20,000,000",
+            "Over 20,000,000", "Total"};
+    protected int[] WIDTHS = new int[]{35, 20, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12};
     
     protected IndexedAggregator aggregator = new IndexedAggregator("area", () -> new IndexedAggregator("type", () -> new ByVarAggregator(bandVars))); 
     protected IndexedAggregator areaTotals = new IndexedAggregator("area", () -> new ByVarAggregator(bandVars)); 

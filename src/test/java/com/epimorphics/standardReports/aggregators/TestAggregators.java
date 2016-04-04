@@ -150,6 +150,7 @@ public class TestAggregators {
         bpa.writeAsCSV(out, request);
         
         String expected = FileManager.get().readWholeFileAsUTF8("src/test/data/devon-banded-agg.csv");
+//        System.out.println("TEMP:\n" + filterCreatedMetadata( out.toString() ));
         assertEquals(expected, filterCreatedMetadata( out.toString() ));
         
         // Testing Excel output is correct is tricky (and currently manual) but at least this checks it runs
