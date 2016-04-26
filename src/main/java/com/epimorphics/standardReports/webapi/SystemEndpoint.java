@@ -9,6 +9,7 @@
 
 package com.epimorphics.standardReports.webapi;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -56,6 +57,35 @@ public class SystemEndpoint extends SREndpointBase {
         long cutoff = System.currentTimeMillis() - rm.getRecordRetentionPeriod() * 60 * 60 * 24 * 1000;
         queue.removeOldCompletedRequests(cutoff);
         return Response.ok().build();
+    }
+    
+    /**
+     * Requests suspension of processsing
+     */
+    @POST
+    @Path("suspend")
+    public Response suspend() {
+        getReportManager().suspend();
+        return Response.ok("Suspending").build();
+    }
+    
+    /**
+     * Resume processsing after a suspension
+     */
+    @POST
+    @Path("resume")
+    public Response resume() {
+        getReportManager().resume();
+        return Response.ok("Resuming").build();
+    }
+    
+    /**
+     * Return the current processing status: Running, Suspending, or Suspended 
+     */
+    @GET
+    @Path("status")
+    public String getStatus() {
+        return getReportManager().getStatus().name();
     }
     
 }

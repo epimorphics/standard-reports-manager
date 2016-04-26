@@ -47,14 +47,20 @@ public class ReportManager extends ComponentBase implements Startup {
     public static final String MOCK_DATA = "{webapp}/mockData/All_Postcode_Districts_within_GREATER_LONDON";
 
     protected static int RETRY_LIMIT = 2;
-    
-    static Logger log = LoggerFactory.getLogger( ReportManager.class );
-    
+
+    static Logger log = LoggerFactory.getLogger(ReportManager.class);
+
     protected RequestManager requestManager;
     protected SRQueryFactory srQueryFactory;
-    protected File  workDir;
-    protected File  templateDir;
-    protected long  recordRentionPeriod = 30;
+    protected File workDir;
+    protected File templateDir;
+    protected long recordRentionPeriod = 30;
+    protected boolean suspend = false;
+    protected boolean suspended = false;
+
+    public enum Status {
+        Running, Suspending, Suspended
+    };
 
     public RequestManager getRequestManager() {
         return requestManager;
@@ -63,34 +69,66 @@ public class ReportManager extends ComponentBase implements Startup {
     public void setRequestManager(RequestManager requestManager) {
         this.requestManager = requestManager;
     }
-    
+
     /**
      * Time for which to keep old completion record (in days)
      */
     public long getRecordRetentionPeriod() {
         return recordRentionPeriod;
     }
-    
+
     public void setRecordRetentionPeriod(long recordRetentionPeriod) {
         this.recordRentionPeriod = recordRetentionPeriod;
     }
-    
+
     public void setTemplateDir(String templateDir) {
         String td = expandFileLocation(templateDir);
-        srQueryFactory = new SRQueryFactory( td );
+        srQueryFactory = new SRQueryFactory(td);
         this.templateDir = new File(td);
     }
-    
+
     public void setWorkDir(String workDir) {
         String dir = expandFileLocation(workDir);
-        this.workDir = new File( dir );
+        this.workDir = new File(dir);
         FileUtil.ensureDir(dir);
     }
+
+    /**
+     * Request processor stop after current request
+     */
+    public synchronized void suspend() {
+        suspend = true;
+    }
     
+    /**
+     * Request processor restart after a suspension
+     */
+    public synchronized void resume() {
+        suspend = false;
+        if (suspended) {
+            suspended = false;
+            log.info("Requesting resumption of batch processing");
+            TimerManager.get().schedule(new RequestProcessor(), 1,
+                    TimeUnit.SECONDS);    
+        }
+    }
+
+    /**
+     * Check current processing state
+     */
+    public synchronized Status getStatus() {
+        if (suspend) {
+            return suspended ? Status.Suspended : Status.Suspending;
+        } else {
+            return Status.Running;
+        }
+    }
+
     @Override
     public void startup(App app) {
         super.startup(app);
-        TimerManager.get().schedule(new RequestProcessor(), 1, TimeUnit.SECONDS);
+        TimerManager.get().schedule(new RequestProcessor(), 1,
+                TimeUnit.SECONDS);
     }
 
     public SRQuery getQuery(String templateName) {
@@ -98,9 +136,10 @@ public class ReportManager extends ComponentBase implements Startup {
     }
 
     public String getRawQuery(String templateName) {
-        return FileManager.get().readWholeFileAsUTF8( new File(templateDir, templateName).getPath() );
+        return FileManager.get().readWholeFileAsUTF8(
+                new File(templateDir, templateName).getPath());
     }
-    
+
     public class RequestProcessor implements Runnable {
 
         @Override
@@ -109,68 +148,95 @@ public class ReportManager extends ComponentBase implements Startup {
             CacheManager cache = requestManager.getCacheManager();
             SparqlSource source = AppConfig.getApp().getA(SparqlSource.class);
             if (source == null) {
-                log.error("Fatal configuration error: can't find source to query from");
+                log.error(
+                        "Fatal configuration error: can't find source to query from");
                 return;
             }
 
             log.info("Request processor starting");
             try {
-                while (true) {
+                while ( ! suspend ) {
                     BatchRequest request = queue.nextRequest(1000);
                     if (request != null) {
                         log.info("Processing request: " + request.getKey());
-                        
+
                         if (request.getParameters().containsKey(TEST_PARAM)) {
                             // Dummy delay for mock up
                             Thread.sleep(10000);
-                            cache.upload(request, "csv", new File( expandFileLocation(MOCK_DATA) + ".csv"));
-                            cache.upload(request, "xlsx", new File( expandFileLocation(MOCK_DATA) + ".xlsx"));
-                            
+                            cache.upload(request, "csv", new File(
+                                    expandFileLocation(MOCK_DATA) + ".csv"));
+                            cache.upload(request, "xlsx", new File(
+                                    expandFileLocation(MOCK_DATA) + ".xlsx"));
+
                         } else {
-                            String reportType = request.getParameters().getFirst(REPORT);
-                            String queryTemplate =  reportType + ".sq";
+                            String reportType = request.getParameters()
+                                    .getFirst(REPORT);
+                            String queryTemplate = reportType + ".sq";
                             SRQuery query = srQueryFactory.get(queryTemplate);
-                            
+
                             if (query == null) {
-                                log.error("Fatal configuration error: can't find query - " + queryTemplate);
-                                queue.failRequest( request.getKey() );
-                                
+                                log.error(
+                                        "Fatal configuration error: can't find query - "
+                                                + queryTemplate);
+                                queue.failRequest(request.getKey());
+
                             } else {
                                 query = query.bindRequest(request);
                                 boolean succeeded = false;
-                                for (int retry = 0; retry < RETRY_LIMIT && !succeeded; retry++) {
+                                for (int retry = 0; retry < RETRY_LIMIT
+                                        && !succeeded; retry++) {
                                     try {
                                         long start = System.currentTimeMillis();
                                         String queryStr = query.getQuery();
                                         log.info("Running query: " + queryStr);
-                                        ResultSet results = source.select( queryStr );
-                                        SRAggregator agg = reportType.equals(REPORT_BYPRICE) ? new AveragePriceAggregator() : new BandedPriceAggregator();
+                                        ResultSet results = source
+                                                .select(queryStr);
+                                        SRAggregator agg = reportType
+                                                .equals(REPORT_BYPRICE)
+                                                        ? new AveragePriceAggregator()
+                                                        : new BandedPriceAggregator();
                                         while (results.hasNext()) {
-                                            agg.add( results.next() );
+                                            agg.add(results.next());
                                         }
-                                        
-                                        File file = new File(workDir, request.getKey() + ".csv");
-                                        agg.writeAsCSV(new FileOutputStream(file), request.getParameters());
+
+                                        File file = new File(workDir,
+                                                request.getKey() + ".csv");
+                                        agg.writeAsCSV(
+                                                new FileOutputStream(file),
+                                                request.getParameters());
                                         cache.upload(request, "csv", file);
                                         file.delete();
-                                        
-                                        file = new File(workDir, request.getKey() + ".xlsx");
-                                        agg.writeAsExcel(new FileOutputStream(file), request.getParameters());
+
+                                        file = new File(workDir,
+                                                request.getKey() + ".xlsx");
+                                        agg.writeAsExcel(
+                                                new FileOutputStream(file),
+                                                request.getParameters());
                                         cache.upload(request, "xlsx", file);
                                         file.delete();
-    
-                                        long duration = System.currentTimeMillis() - start;
-                                        log.info("Request completed: " + request.getKey() + " in " + NameUtils.formatDuration(duration));
-                                        queue.finishRequest( request.getKey() );
+
+                                        long duration = System
+                                                .currentTimeMillis() - start;
+                                        log.info("Request completed: "
+                                                + request.getKey() + " in "
+                                                + NameUtils.formatDuration(
+                                                        duration));
+                                        queue.finishRequest(request.getKey());
                                         succeeded = true;
-    
+
                                     } catch (Exception e) {
                                         if (retry < RETRY_LIMIT - 1) {
-                                            log.warn("Request " + request.getKey() + " failed, retrying after 10s" , e);
+                                            log.warn(
+                                                    "Request "
+                                                            + request.getKey()
+                                                            + " failed, retrying after 10s",
+                                                    e);
                                             Thread.sleep(10000);
                                         } else {
-                                            log.error("Request " + request.getKey() + " failed" , e);
-                                            queue.failRequest( request.getKey() );
+                                            log.error("Request "
+                                                    + request.getKey()
+                                                    + " failed", e);
+                                            queue.failRequest(request.getKey());
                                         }
                                     }
                                 }
@@ -179,8 +245,10 @@ public class ReportManager extends ComponentBase implements Startup {
                     }
                 }
             } catch (InterruptedException e) {
-                log.info("Request processor interrupted, exiting");
+                log.info("Request processor interrupted");
             }
+            suspended = true;
+            log.info("Request processing halted");
         }
     }
 }

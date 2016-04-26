@@ -77,3 +77,7 @@ Example test cases:
     curl -i -X POST "http://localhost:8080/sr-manager/report-request?area=EW&period=2015&areaType=country&report=banded&age=any&aggregate=pcSector"
 
     curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=district&area=KENSINGTON+AND+CHELSEA&aggregate=district&period=2015&age=any&report=banded"    
+
+    curl -i -X POST http://localhost:8080/sr-manager/system/suspend
+    curl -i -X POST http://localhost:8080/sr-manager/system/resume
+    curl -i http://localhost:8080/sr-manager/system/status
