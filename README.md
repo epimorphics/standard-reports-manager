@@ -81,3 +81,12 @@ Example test cases:
     curl -i -X POST http://localhost:8080/sr-manager/system/suspend
     curl -i -X POST http://localhost:8080/sr-manager/system/resume
     curl -i http://localhost:8080/sr-manager/system/status
+
+
+Test sequence:
+    curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=HAMPSHIRE&aggregate=district&period=2015-Q3&report=avgPrice"
+    curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=county&area=DEVON&aggregate=district&period=2015-06&age=new&report=avgPrice"
+    curl -i -X POST http://localhost:8080/sr-manager/system/suspend
+    curl -i http://localhost:8080/sr-manager/system/status
+
+    curl -i -X POST http://localhost:8080/sr-manager/system/resume
