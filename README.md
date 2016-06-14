@@ -90,3 +90,14 @@ Test sequence:
     curl -i http://localhost:8080/sr-manager/system/status
 
     curl -i -X POST http://localhost:8080/sr-manager/system/resume
+
+Extra band check case:
+
+curl -i -X POST "http://localhost:8080/sr-manager/report-request?areaType=district&area=KENSINGTON+AND+CHELSEA&aggregate=district&period=2015-Q4&age=new&report=banded" 
+
+Should have:
+
+1001k - 1250k  1
+1251k - 1500k  1
+1501k - 1750k  2
+1751k - 2000k  7
