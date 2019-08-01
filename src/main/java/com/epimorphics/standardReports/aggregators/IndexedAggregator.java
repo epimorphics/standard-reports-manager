@@ -64,7 +64,7 @@ public class IndexedAggregator implements Aggregator {
     }
     
     public Accumulator getTotal() {
-        return total;
+        return total == null ? new Accumulator(countVar, totalVar) : total ;
     }
     
     public List<String> listIndexes() {
