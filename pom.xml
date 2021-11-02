@@ -48,54 +48,30 @@
       <name>Epimorphics Public Repository</name>
       <url>http://repository.epimorphics.com</url>
     </repository>
- 
-    <repository>  
-     <id>epi-public-s3-snapshot</id>  
-     <name>Epimorphics S3 snapshot repository</name>  
-     <url>s3://epi-repository/snapshot</url>  
-     <releases>  
-       <enabled>false</enabled>  
-     </releases>  
-     <snapshots>  
-       <enabled>true</enabled>  
-     </snapshots>  
-    </repository>  
 
-    <repository>  
-     <id>epi-public-s3-release</id>  
-     <name>Epimorphics S3 release repository</name>  
-     <url>s3://epi-repository/release</url>  
-     <releases>  
-       <enabled>true</enabled>  
-     </releases>  
-     <snapshots>  
-       <enabled>false</enabled>  
-     </snapshots>  
-    </repository>  
-    
-    <repository>  
-     <id>epi-private-s3-snapshot</id>  
-     <name>Epimorphics S3 private snapshot repository</name>  
-     <url>s3://epi-private-repository/snapshot</url>  
-     <releases>  
-       <enabled>false</enabled>  
-     </releases>  
-     <snapshots>  
-       <enabled>true</enabled>  
-     </snapshots>  
-    </repository>  
+      <repository>
+          <id>epi-public-s3-snapshot</id>
+          <name>Epimorphics S3 snapshot repository</name>
+          <url>https://s3-eu-west-1.amazonaws.com/epi-repository/snapshot</url>
+          <releases>
+              <enabled>false</enabled>
+          </releases>
+          <snapshots>
+              <enabled>true</enabled>
+          </snapshots>
+      </repository>
 
-    <repository>  
-     <id>epi-private-s3-release</id>  
-     <name>Epimorphics S3 private release repository</name>  
-     <url>s3://epi-private-repository/release</url>  
-     <releases>  
-       <enabled>true</enabled>  
-     </releases>  
-     <snapshots>  
-       <enabled>false</enabled>  
-     </snapshots>  
-    </repository>  
+      <repository>
+          <id>epi-public-s3-release</id>
+          <name>Epimorphics S3 release repository</name>
+          <url>https://s3-eu-west-1.amazonaws.com/epi-repository/release</url>
+          <releases>
+              <enabled>true</enabled>
+          </releases>
+          <snapshots>
+              <enabled>false</enabled>
+          </snapshots>
+      </repository>
     
   </repositories>
   
