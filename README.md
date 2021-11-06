@@ -63,7 +63,7 @@ Field | Value | Notes
 
 To run locally but point queries at the dev server set up a local tunnel:
 
-    ssh -f lr-data-staging-b -L 3030:ec2-54-246-79-255.eu-west-1.compute.amazonaws.com:3030 -N
+    ssh lr-ppd-preprod-data-1 -L 3030:localhost:3030 -N
 
 Example test cases:
 
