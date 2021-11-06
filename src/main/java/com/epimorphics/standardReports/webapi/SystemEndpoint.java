@@ -60,7 +60,7 @@ public class SystemEndpoint extends SREndpointBase {
     }
     
     /**
-     * Requests suspension of processsing
+     * Requests suspension of processing
      */
     @POST
     @Path("suspend")
@@ -70,7 +70,7 @@ public class SystemEndpoint extends SREndpointBase {
     }
     
     /**
-     * Resume processsing after a suspension
+     * Resume processing after a suspension
      */
     @POST
     @Path("resume")
@@ -87,5 +87,13 @@ public class SystemEndpoint extends SREndpointBase {
     public String getStatus() {
         return getReportManager().getStatus().name();
     }
-    
+
+    /**
+     * Return prometheus format text metrics
+     */
+    @GET
+    @Path("metrics")
+    public String getMetrics() {
+        return getReportManager().getRegistry().scrape();
+    }
 }
