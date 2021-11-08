@@ -1,5 +1,6 @@
 version: 2
 name:  epimorphics/sr-manager
+key: sr-manager
 deployments:
   - tag: "{ver}"
     publish: "production"
