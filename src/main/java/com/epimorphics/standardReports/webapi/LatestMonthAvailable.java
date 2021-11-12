@@ -69,7 +69,6 @@ public class LatestMonthAvailable extends SREndpointBase {
         LocalDate third = second.plus(1, ChronoUnit.DAYS);
         probeQuery = probeQuery.replace("?third", third.format(DateTimeFormatter.ISO_LOCAL_DATE));
 
-        System.out.println("Debug: probe query is: " + probeQuery);
         return source.ask(probeQuery);
     }
 }

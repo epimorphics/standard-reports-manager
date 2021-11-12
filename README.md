@@ -6,21 +6,54 @@ Implements both report submission/status tracking web service and backend report
 
 ## Endpoints provided
 
+### Report processing
+
+Submit a request (defined by query parameters) via POST, returns location request status information:
+
     POST /sr-manager/report-request?...
 
-submit a request (defined by query parameters) via POST, returns location request status information.
+Get status information in JSON for the identified request:
 
     GET /sr-manager/report-request/{id}
 
-returns status information in JSON for the identified request.
+Retrieve a prepared report:
 
     GET /sr-manager/report/{id}.{csv|xlsx}
 
-returns a prepared report (may be replaced by S3 endpoint in the future).
+Get the most recent month for which data is available as a plain string (e.g. "2015-09"):
 
     GET /sr-manager/latest-month-available
 
-returns the most recent month for which data is available as a plain string (e.g. "2015-09").
+
+### Management and metrics
+
+Clear the transient cache:
+
+    GET /sr-manager/system/clear-cache
+
+Clear the transient and persistent caches:
+
+    GET /sr-manager/system/clear-cache-all
+
+Prune old completed records from the queue manager:
+
+    POST /sr-manager/system/clear-old-records
+
+Suspend report processing (after current report finishes):
+
+    POST /sr-manager/system/suspend
+
+Resume report processing:
+
+    POST /sr-manager/system/resume
+
+Return the current status of report processing (Running, Suspending, or Suspended):
+
+    POST /sr-manager/system/status
+
+Prometheus metrics scrape endpoint:
+
+    POST /sr-manager/system/metrics
 
 ## Requests
 
@@ -59,11 +92,17 @@ Field | Value | Notes
 `eta` | time left in ms | Only available of Pending/InProgress
 `started` | date-time string | Time an InProgress request started processing
 
+## Configuration
+
+The configuration of the request processing (queue manager and location, store manager and location, sparql endpoint) is all specified in an appbase configuration file in `/etc/standard-reports/app.conf`. The desired configuration file should be mounted into this location in the container. 
+
+The default configuration is suitable for testing only and uses an in-memory queue, file store manager (in `/tmp`) and assumes a sparql endpoint of `http://localhost:3030/landregistry_to/query`
+
 ## Development setup
 
 To run locally but point queries at the dev server set up a local tunnel:
 
-    ssh -f lr-data-staging-b -L 3030:ec2-54-246-79-255.eu-west-1.compute.amazonaws.com:3030 -N
+    ssh lr-ppd-preprod-data-1 -L 3030:localhost:3030 -N
 
 Example test cases:
 

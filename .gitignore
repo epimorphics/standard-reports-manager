@@ -4,3 +4,5 @@ target/
 .project
 velocity.log
 .vagrant
+.idea
+work

@@ -1,0 +1,12 @@
+version: 2
+name:  epimorphics/sr-manager
+key: sr-manager
+deployments:
+  - tag: "{ver}"
+    publish: "production"
+
+  - branch: "dev"
+    publish: "dev"
+
+  - branch: "preprod"
+    publish: "preprod"

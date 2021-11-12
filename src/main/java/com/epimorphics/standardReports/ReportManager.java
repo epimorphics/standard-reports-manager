@@ -17,6 +17,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 
+import com.epimorphics.appbase.core.Shutdown;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.util.FileManager;
 import org.slf4j.Logger;
@@ -43,7 +52,7 @@ import com.epimorphics.util.NameUtils;
  * 
  * @author <a href="mailto:dave@epimorphics.com">Dave Reynolds</a>
  */
-public class ReportManager extends ComponentBase implements Startup {
+public class ReportManager extends ComponentBase implements Startup, Shutdown {
     public static final String MOCK_DATA = "{webapp}/mockData/All_Postcode_Districts_within_GREATER_LONDON";
 
     protected static int RETRY_LIMIT = 2;
@@ -70,6 +79,24 @@ public class ReportManager extends ComponentBase implements Startup {
         this.requestManager = requestManager;
     }
 
+    protected PrometheusMeterRegistry registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    protected Counter metricFailed =Counter
+            .builder("reports.failed")
+            .description("number of reports which started but failed")
+            .register(registry);
+    protected Counter metricProcessed =Counter
+            .builder("reports.processed")
+            .description("number of reports processed, includes retries and fails")
+            .register(registry);
+    protected Counter metricRetries =Counter
+            .builder("reports.retries")
+            .description("number of reports which had to be retried")
+            .register(registry);
+    protected Timer metricTimer = Timer
+            .builder("reports.duration")
+            .description("timer mentics on how long reports are taking to run")
+            .register(registry);
+
     /**
      * Time for which to keep old completion record (in days)
      */
@@ -93,6 +120,9 @@ public class ReportManager extends ComponentBase implements Startup {
         FileUtil.ensureDir(dir);
     }
 
+    public PrometheusMeterRegistry getRegistry() {
+        return registry;
+    }
     /**
      * Request processor stop after current request
      */
@@ -129,6 +159,19 @@ public class ReportManager extends ComponentBase implements Startup {
         super.startup(app);
         TimerManager.get().schedule(new RequestProcessor(), 1,
                 TimeUnit.SECONDS);
+        initMetrics();
+    }
+
+    @Override
+    public void shutdown() {
+        TimerManager.get().shutdown();
+    }
+
+    private void initMetrics() {
+        new JvmMemoryMetrics().bindTo(registry);
+        new JvmGcMetrics().bindTo(registry);
+        new JvmThreadMetrics().bindTo(registry);
+        new ProcessorMetrics().bindTo(registry);
     }
 
     public SRQuery getQuery(String templateName) {
@@ -183,6 +226,7 @@ public class ReportManager extends ComponentBase implements Startup {
                             } else {
                                 query = query.bindRequest(request);
                                 boolean succeeded = false;
+                                metricProcessed.increment();
                                 for (int retry = 0; retry < RETRY_LIMIT
                                         && !succeeded; retry++) {
                                     try {
@@ -221,6 +265,7 @@ public class ReportManager extends ComponentBase implements Startup {
                                                 + request.getKey() + " in "
                                                 + NameUtils.formatDuration(
                                                         duration));
+                                        metricTimer.record(duration, TimeUnit.MILLISECONDS);
                                         queue.finishRequest(request.getKey());
                                         succeeded = true;
 
@@ -231,12 +276,14 @@ public class ReportManager extends ComponentBase implements Startup {
                                                             + request.getKey()
                                                             + " failed, retrying after 10s",
                                                     e);
+                                            metricRetries.increment();
                                             Thread.sleep(10000);
                                         } else {
                                             log.error("Request "
                                                     + request.getKey()
                                                     + " failed", e);
                                             queue.failRequest(request.getKey());
+                                            metricFailed.increment();
                                         }
                                     }
                                 }
