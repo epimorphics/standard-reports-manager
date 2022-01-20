@@ -12,6 +12,7 @@ package com.epimorphics.standardReports.webapi;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import com.epimorphics.armlib.CacheManager;
@@ -93,6 +94,7 @@ public class SystemEndpoint extends SREndpointBase {
      */
     @GET
     @Path("metrics")
+    @Produces("text/plain;version=0.0.4")
     public String getMetrics() {
         return getReportManager().getRegistry().scrape();
     }
