@@ -100,9 +100,13 @@ The default configuration is suitable for testing only and uses an in-memory que
 
 ## Development setup
 
-To run locally but point queries at the dev server set up a local tunnel:
+To run the container locally with the default configuration (sparql endpoint of `http://localhost:3030/landregistry_to/query`):
 
-    ssh lr-ppd-preprod-data-1 -L 3030:localhost:3030 -N
+    AWS_PROFILE=lr docker run -v -p 8080:8080 018852084843.dkr.ecr.eu-west-1.amazonaws.com/epimorphics/standard-reports-manager/dev:${VERSION}
+
+To use the public LR sparql endpoint (which is subject to a 90s/120s timeout) then use the configuration file in `dev/app.conf` e.g.:
+
+    AWS_PROFILE=lr docker run -v $(pwd)/dev/app.conf:/etc/standard-reports/app.conf -p 8080:8080 018852084843.dkr.ecr.eu-west-1.amazonaws.com/epimorphics/standard-reports-manager/dev:${VERSION}
 
 Example test cases:
 
