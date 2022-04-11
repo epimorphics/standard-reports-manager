@@ -2,9 +2,12 @@ version: 2
 name:  epimorphics/standard-reports-manager
 key: std_rpts_mgr
 deployments:
-  - tag: "{ver}"
-    publish: "production"
-    deploy: "production"
+  - branch: "prod"
+    deploy: "prod"
+    publish: "prod"
+  - branch: "preprod"
+    deploy: "preprod"
+    publish: "preprod"
   - branch: "master"
     publish: "dev"
     deploy: "dev"
