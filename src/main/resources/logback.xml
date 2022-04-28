@@ -1,15 +1,25 @@
 <configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
-                <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter"/>
-                <appendLineSeparator>true</appendLineSeparator>
-                <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSZ</timestampFormat>
-            </layout>
+    <appender name="jsonstdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>
+            <excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>
+            <excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>
+            <excludeMdcKeyName>spanExportable</excludeMdcKeyName>
+            <timeZone>UTC</timeZone>
+            <fieldNames>
+                <timestamp>ts</timestamp>
+                <version>version</version>
+            </fieldNames>
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                <maxLength>2048</maxLength>
+                <shortenedClassNameLength>20</shortenedClassNameLength>
+                <rootCauseFirst>true</rootCauseFirst>
+            </throwableConverter>
         </encoder>
     </appender>
 
     <root level="info">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="jsonstdout" />
     </root>
 </configuration>
