@@ -1,0 +1,4 @@
+#!/bin/bash
+# Resume standard reports processing
+echo "Resuming standard reports processing"
+curl -s -X POST "http://localhost:8080/sr-manager/system/resume"

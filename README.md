@@ -98,6 +98,16 @@ The configuration of the request processing (queue manager and location, store m
 
 The default configuration is suitable for testing only and uses an in-memory queue, file store manager (in `/tmp`) and assumes a sparql endpoint of `http://localhost:3030/landregistry_to/query`
 
+## Ops actions
+
+The docker image includes scripts to manage standard reports processing. These can be invoked by an `exec` into the image.
+
+| Script | Action | Notes
+|---|---|---|
+| `suspend` | Halt report processing after the current report has completed | Allows up to 15 min for the suspend. If report is stuck and can't be suspended in that time the script will abort with exit code 1. |
+| `resume` | Resume report processing after a suspension | |
+| `clearcache` | Clear the cache of generated reports (on S3) | |
+
 ## Development setup
 
 To run the container locally with the default configuration (sparql endpoint of `http://localhost:3030/landregistry_to/query`):

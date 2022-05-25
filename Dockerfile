@@ -18,6 +18,7 @@ COPY conf/logging.properties /usr/local/tomcat/conf
 ## install sr-manager
 COPY --from=build /usr/src/app/target/sr-manager*.war /usr/local/tomcat/webapps/sr-manager.war
 COPY src/main/webapp/WEB-INF/app.conf /etc/standard-reports/app.conf
+COPY ./scripts /usr/local/bin
 
 RUN adduser -u 1012 app \
   && chown -R app /usr/local/tomcat /etc/standard-reports
