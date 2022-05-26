@@ -2,3 +2,4 @@
 # Clear all existing reports cached in S3 - call when data changes and old reports and invalid
 echo "Clearing Standard reports cache"
 curl -s -X POST "http://localhost:8080/sr-manager/system/clear-cache-all"
+curl -s -X POST "http://localhost:8080/sr-manager/system/clear-old-records"

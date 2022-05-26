@@ -71,4 +71,8 @@ public class LatestMonthAvailable extends SREndpointBase {
 
         return source.ask(probeQuery);
     }
+
+    public static void clearCache() {
+        latestMonth = null;
+    }
 }

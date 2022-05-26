@@ -33,6 +33,7 @@ public class SystemEndpoint extends SREndpointBase {
     public Response clearCache() {
         CacheManager cache = getReportManager().getRequestManager().getCacheManager();
         cache.clearNonSticky();
+        LatestMonthAvailable.clearCache();
         return Response.ok().build();
     }
 
@@ -44,6 +45,7 @@ public class SystemEndpoint extends SREndpointBase {
     public Response clearAllCache() {
         CacheManager cache = getReportManager().getRequestManager().getCacheManager();
         cache.clear();
+        LatestMonthAvailable.clearCache();
         return Response.ok().build();
     }
 
