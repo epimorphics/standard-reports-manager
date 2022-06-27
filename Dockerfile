@@ -4,8 +4,8 @@ COPY src /usr/src/app/src
 COPY pom.xml /usr/src/app  
 RUN mvn -f /usr/src/app/pom.xml clean package
 
-# Package - using tomcat7 for now but should be compatible with tomcat 8
-FROM tomcat:7.0.109-jdk8-corretto
+# Package
+FROM tomcat:8.5.81-jdk8-corretto
 RUN yum -y install shadow-utils
 
 ## set up structured logging for tomcat

@@ -112,7 +112,7 @@ The docker image includes scripts to manage standard reports processing. These c
 
 To run the container locally with the default configuration (sparql endpoint of `http://localhost:3030/landregistry_to/query`):
 
-    AWS_PROFILE=lr docker run -v -p 8080:8080 018852084843.dkr.ecr.eu-west-1.amazonaws.com/epimorphics/standard-reports-manager/dev:${VERSION}
+    AWS_PROFILE=lr docker run -p 8080:8080 018852084843.dkr.ecr.eu-west-1.amazonaws.com/epimorphics/standard-reports-manager/dev:${VERSION}
 
 To use the public LR sparql endpoint (which is subject to a 90s/120s timeout) then use the configuration file in `dev/app.conf` e.g.:
 
