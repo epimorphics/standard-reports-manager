@@ -25,7 +25,6 @@ RUN adduser -u 1012 app \
 USER app
 
 ARG image_name
-ARG build_date
 ARG git_branch
 ARG git_commit_hash
 ARG github_run_number
@@ -34,6 +33,5 @@ ARG version
 LABEL com.epimorphics.name=$image_name \
       com.epimorphics.branch=$git_branch \
       com.epimorphics.build=$github_run_number \
-      com.epimorphics.created=$build_date \
       com.epimorphics.commit=$git_commit_hash \
       com.epimorphics.version=$version

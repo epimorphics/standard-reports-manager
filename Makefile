@@ -15,15 +15,14 @@ TAG?=$(shell printf '%s_%s_%08d' ${MVN_VERSION} ${COMMIT} ${GITHUB_RUN_NUMBER})
 all: publish
 
 image:
-	@echo Building ${REPO}:${TAG} ...
+	@echo Building ${IMAGE}:${TAG} ...
 	@docker build \
-		--build-arg build_date=`date -Iseconds` \
 		--build-arg git_branch=${BRANCH} \
 		--build-arg git_commit_hash=${COMMIT} \
 		--build-arg github_run_number=${GITHUB_RUN_NUMBER} \
 		--build-arg image_name=${NAME} \
 		--build-arg version=${MVN_VERSION} \
-		--tag ${REPO}:${TAG} \
+		--tag ${IMAGE}:${TAG} \
 		.
 	@echo Done.
 
