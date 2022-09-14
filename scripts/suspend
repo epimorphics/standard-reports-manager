@@ -1,8 +1,14 @@
 #!/bin/bash
 # Suspend standard reports processing
 # Makimum of 15min waiting after which gives in.
+set -e
+
 echo "Suspending standard reports processing"
-curl -s -X POST "http://localhost:8080/sr-manager/system/suspend"
+RESPONSE=$( curl -s -X POST "http://localhost:8080/sr-manager/system/suspend" )
+if [[ $RESPONSE != Suspending ]]; then 
+    echo "Failed: unexpected response from sr-manager $RESPONSE"
+    exit 1
+fi
 for COUNT in $(seq 180)
 do
     STATE=$( curl -s http://localhost:8080/sr-manager/system/status )
@@ -13,4 +19,3 @@ do
     sleep 5
 done
 echo "Warning: SR suspension failed, aborting suspend"
-exit 1
