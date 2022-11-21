@@ -51,16 +51,19 @@ public class LogRequestFilter implements Filter {
         if (requestID == null || requestID.isEmpty()) {
             requestID = Long.toString(transactionCount.incrementAndGet());
         }
-        MDC.put("request_id", requestID);
+        MDC.put("request-id", requestID);
         long start = System.currentTimeMillis();
 
         String fullpath = path + (query == null ? "" : ("?" + query));
         MDC.put("path", fullpath);
-        log.info( String.format("Request  [%s] : %s", requestID, fullpath) );
+        // log.info( String.format("Request  [%s] : %s", requestID, fullpath) );
         httpResponse.addHeader(RESPONSE_ID_HEADER, requestID);
         chain.doFilter(request, response);
-        log.info( String.format("Response [%s] : %d (%s)", requestID, httpResponse.getStatus(),
-                NameUtils.formatDuration(System.currentTimeMillis() - start)) );
+        int status = httpResponse.getStatus();
+        Long duration = System.currentTimeMillis() - start;
+        MDC.put("status", Integer.toString(status));
+        MDC.put("duration", Long.toString(duration));
+        log.info(String.format("Request [%s] : %s : %s", requestID, fullpath, status));
     }
 
     @Override
