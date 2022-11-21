@@ -46,6 +46,7 @@ import com.epimorphics.standardReports.aggregators.BandedPriceAggregator;
 import com.epimorphics.standardReports.aggregators.SRAggregator;
 import com.epimorphics.util.FileUtil;
 import com.epimorphics.util.NameUtils;
+import org.slf4j.MDC;
 
 /**
  * The manager for requesting and generating standard reports.
@@ -196,12 +197,13 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                 return;
             }
 
-            log.info("Request processor starting");
+            log.info("Report processor starting");
             try {
                 while ( ! suspend ) {
                     BatchRequest request = queue.nextRequest(1000);
                     if (request != null) {
-                        log.info("Processing request: " + request.getKey());
+                        MDC.put("request-id", request.getKey());
+                        log.info("Processing report: " + request.getKey());
 
                         if (request.getParameters().containsKey(TEST_PARAM)) {
                             // Dummy delay for mock up
@@ -232,6 +234,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                                     try {
                                         long start = System.currentTimeMillis();
                                         String queryStr = query.getQuery();
+                                        MDC.put("request-id", request.getKey());
                                         log.info("Running query: " + queryStr);
                                         ResultSet results = source
                                                 .select(queryStr);
@@ -261,7 +264,9 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
 
                                         long duration = System
                                                 .currentTimeMillis() - start;
-                                        log.info("Request completed: "
+                                        MDC.put("duration", Long.toString(duration));
+                                        MDC.put("request-id", request.getKey());
+                                        log.info("Report completed: "
                                                 + request.getKey() + " in "
                                                 + NameUtils.formatDuration(
                                                         duration));
@@ -292,10 +297,10 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                     }
                 }
             } catch (InterruptedException e) {
-                log.info("Request processor interrupted");
+                log.info("Report processor interrupted");
             }
             suspended = true;
-            log.info("Request processing halted");
+            log.info("Report processing halted");
         }
     }
 }
