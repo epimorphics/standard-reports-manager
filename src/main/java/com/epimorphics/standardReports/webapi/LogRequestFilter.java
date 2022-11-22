@@ -62,7 +62,7 @@ public class LogRequestFilter implements Filter {
         int status = httpResponse.getStatus();
         Long duration = System.currentTimeMillis() - start;
         MDC.put("status", Integer.toString(status));
-        MDC.put("duration", Long.toString(duration));
+        MDC.put("duration", Long.toString(duration*1000));
         log.info(String.format("Request [%s] : %s : %s", requestID, fullpath, status));
     }
 

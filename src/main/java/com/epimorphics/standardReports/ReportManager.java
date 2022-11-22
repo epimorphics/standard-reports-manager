@@ -264,7 +264,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
 
                                         long duration = System
                                                 .currentTimeMillis() - start;
-                                        MDC.put("duration", Long.toString(duration));
+                                        MDC.put("duration", Long.toString(duration*1000));
                                         MDC.put("request-id", request.getKey());
                                         log.info("Report completed: "
                                                 + request.getKey() + " in "
