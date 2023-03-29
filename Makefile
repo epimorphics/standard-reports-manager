@@ -6,11 +6,14 @@ STAGE?=dev
 ECR?=${ACCOUNT}.dkr.ecr.eu-west-1.amazonaws.com
 IMAGE?=${NAME}/${STAGE}
 REPO?=${ECR}/${IMAGE}
+SHORTNAME?=$(shell echo ${NAME} | cut -f2 -d/)
 
 BRANCH:=$(shell git rev-parse --abbrev-ref HEAD)
 COMMIT:=$(shell git rev-parse --short HEAD)
 MVN_VERSION:=$(shell mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 TAG?=$(shell printf '%s_%s_%08d' ${MVN_VERSION} ${COMMIT} ${GITHUB_RUN_NUMBER})
+
+PORT?=8084
 
 all: publish
 
@@ -35,7 +38,10 @@ publish: image
 	@echo Done.
 
 run:
-	@docker run --network host -p 8080:8080 --rm --name sr-manager ${REPO}:${TAG}
+	@if docker network inspect dnet > /dev/null 2>&1; then echo "Using docker network dnet"; else echo "Create docker network dnet"; docker network create dnet; sleep 2; fi
+	@if docker stop ${SHORTNAME} > /dev/null 2>&1; then sleep 5; fi
+	@echo "Starting ${SHORTNAME} ..." 
+	@docker run --network dnet -p ${PORT}:8080 -v $$(pwd)/dev/app.conf:/etc/standard-reports/app.conf --rm --name ${SHORTNAME} ${REPO}:${TAG}
 
 
 tag:
@@ -52,4 +58,5 @@ vars:
 	@echo COMMIT:${COMMIT}
 	@echo IMAGE:${IMAGE}
 	@echo REPO:${REPO}
+	@echo SHORTNAME:${SHORTNAME}
 	@echo TAG:${TAG}
