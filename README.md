@@ -29,11 +29,11 @@ Get the most recent month for which data is available as a plain string (e.g. "2
 
 Clear the transient cache:
 
-    GET /sr-manager/system/clear-cache
+    POST /sr-manager/system/clear-cache
 
 Clear the transient and persistent caches:
 
-    GET /sr-manager/system/clear-cache-all
+    POST /sr-manager/system/clear-cache-all
 
 Prune old completed records from the queue manager:
 
