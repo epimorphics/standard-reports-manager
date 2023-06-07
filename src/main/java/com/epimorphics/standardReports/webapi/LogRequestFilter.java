@@ -60,7 +60,12 @@ public class LogRequestFilter implements Filter {
         Long duration = System.currentTimeMillis() - start;
         MDC.put("status", Integer.toString(status));
         MDC.put("duration", Long.toString(duration*1000));
-        log.info(String.format("Request [%s] : %s : %s", requestID, fullpath, status));
+        if (requestID != null && !requestID.isEmpty()) {
+            log.info(String.format("Request [%s] : %s : %s", requestID, fullpath, status));
+        } else {
+            log.info(String.format("Request : %s : %s", requestID, fullpath, status));
+        }
+        MDC.clear();
     }
 
     @Override
