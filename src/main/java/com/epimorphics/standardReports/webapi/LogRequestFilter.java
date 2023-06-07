@@ -27,14 +27,12 @@ import org.slf4j.MDC;
  * for diagnosis. Not robust against restarts but easier to work with than UUIDs.
  */
 public class LogRequestFilter implements Filter {
-    public static final String TRANSACTION_ATTRIBUTE = "transaction";
-    public static final String START_TIME_ATTRIBUTE  = "startTime";
     public static final String RESPONSE_ID_HEADER  = "X-Response-ID";
     public static final String REQUEST_ID_HEADER  = "X-Request-ID";
+    public static final String REQUEST_ID_LOG_FIELD  = "request_id";
+    public static final String REPORT_ID_LOG_FIELD  = "report_id";
 
     static final Logger log = LoggerFactory.getLogger( LogRequestFilter.class );
-
-    protected static AtomicLong transactionCount = new AtomicLong(0);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -48,10 +46,9 @@ public class LogRequestFilter implements Filter {
         String path = httpRequest.getRequestURI();
         String query = httpRequest.getQueryString();
         String requestID = httpRequest.getHeader(REQUEST_ID_HEADER);
-        if (requestID == null || requestID.isEmpty()) {
-            requestID = Long.toString(transactionCount.incrementAndGet());
+        if (requestID != null && !requestID.isEmpty()) {
+            MDC.put(REQUEST_ID_LOG_FIELD, requestID);
         }
-        MDC.put("request-id", requestID);
         long start = System.currentTimeMillis();
 
         String fullpath = path + (query == null ? "" : ("?" + query));
