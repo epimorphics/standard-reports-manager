@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.jena.atlas.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.yaml.snakeyaml.Yaml;
 
 import com.epimorphics.appbase.core.AppConfig;
@@ -66,6 +67,7 @@ public class ReportRequestEndpoint extends SREndpointBase {
         Request request = getRequest();
         BatchStatus bs = getRequestManager().submit( makeBatchRequest(request) );
         String statusURL = context.getContextPath() + "/report-request/" + bs.getKey();
+        MDC.put(LogRequestFilter.REPORT_ID_LOG_FIELD, bs.getKey());
         try {
             return Response.created( new URI(statusURL) ).build();
         } catch (URISyntaxException e) {
@@ -111,6 +113,7 @@ public class ReportRequestEndpoint extends SREndpointBase {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public JsonObject getStatus(@PathParam("key") String key) {
+        MDC.put(LogRequestFilter.REPORT_ID_LOG_FIELD, key);
         BatchStatus status = getRequestManager().getFullStatus(key);
         if (status.getStatus() == StatusFlag.Unknown) {
             throw new NotFoundException();

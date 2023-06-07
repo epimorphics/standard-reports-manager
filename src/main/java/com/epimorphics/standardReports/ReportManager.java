@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 
 import com.epimorphics.appbase.core.Shutdown;
+import com.epimorphics.standardReports.webapi.LogRequestFilter;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
@@ -209,6 +210,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                     BatchRequest request = queue.nextRequest(1000);
                     if (request != null) {
                         logHeaders(request, ProcessingState.Accepted);
+                        MDC.put(LogRequestFilter.REPORT_ID_LOG_FIELD, request.getKey());
                         log.info("Processing report: " + request.getKey());
 
                         if (request.getParameters().containsKey(TEST_PARAM)) {
