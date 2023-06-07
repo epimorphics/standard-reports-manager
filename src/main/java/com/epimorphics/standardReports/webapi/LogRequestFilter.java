@@ -63,7 +63,7 @@ public class LogRequestFilter implements Filter {
         if (requestID != null && !requestID.isEmpty()) {
             log.info(String.format("Request [%s] : %s : %s", requestID, fullpath, status));
         } else {
-            log.info(String.format("Request : %s : %s", requestID, fullpath, status));
+            log.info(String.format("Request : %s : %s", fullpath, status));
         }
         MDC.clear();
     }
