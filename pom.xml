@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.epimorphics</groupId>
   <artifactId>sr-manager</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <packaging>war</packaging>
   <name>sr-manager</name>
   <description>Standard Reports Manager</description>
@@ -84,6 +84,12 @@
       <groupId>com.epimorphics</groupId>
       <artifactId>sapi-lib</artifactId>
       <version>2.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.epimorphics</groupId>
+      <artifactId>lib</artifactId>
+      <version>3.1.4</version>
     </dependency>
 
     <dependency>
