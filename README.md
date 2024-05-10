@@ -98,6 +98,18 @@ The configuration of the request processing (queue manager and location, store m
 
 The default configuration is suitable for testing only and uses an in-memory queue, file store manager (in `/tmp`) and assumes a sparql endpoint of `http://localhost:3030/landregistry_to/query`
 
+In production configure to use AWS Dynamo DB tables for queue management:
+```
+queue                = com.epimorphics.armlib.impl.DynQueueManager
+queue.checkInterval  = 1500
+queue.tablePrefix    = hmlr-XX-
+```
+
+Tables `{prefix}-Queue` and `{prefix}-Completed` will be created and used for the queue and to the record of completed jobs. These will be created as provisioned table with a default provisioning of 5(read)/5(write) for the Queue table, and 3(read)/1(write) for the Completed table.
+
+**Note:** Recent growth in the number of standard reports processed has meant that the provisioning of the `{prefix}-Completed` table is not enough for production and clearing that table can take 10 minutes or more. Recommend changing the provisioning to on-demand.
+
+
 ## Ops actions
 
 The docker image includes scripts to manage standard reports processing. These can be invoked by an `exec` into the image.
