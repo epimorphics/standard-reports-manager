@@ -34,7 +34,7 @@ publish: image
 	@echo Done.
 
 run:
-	@docker run --network host -p 8080:8080 --rm --name sr-manager ${REPO}:${TAG}
+	@docker run --network host -p 8080:8080 --rm --name sr-manager ${IMAGE}:${TAG}
 
 
 tag:
