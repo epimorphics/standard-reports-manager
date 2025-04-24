@@ -16,7 +16,7 @@ jobs:
       epi_gpr_access_token:  "${{ secrets.EPI_GPR_READ_ACCESS_TOKEN }}"
   deploy: 
     needs: "publish"
-    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@reusable"
+    uses:  "epimorphics/github-workflows/.github/workflows/deploy.yml@v2"
     with:
       # Repository specific
       ansible_repo:     epimorphics/hmlr-ansible-deployment
