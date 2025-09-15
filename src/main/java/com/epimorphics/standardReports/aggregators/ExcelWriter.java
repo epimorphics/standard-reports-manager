@@ -12,12 +12,7 @@ package com.epimorphics.standardReports.aggregators;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -50,7 +45,7 @@ public class ExcelWriter implements SheetWriter {
         wb = new XSSFWorkbook();
         sheet = wb.createSheet("Top sheet");
         
-        XSSFColor green = new XSSFColor(new java.awt.Color(0x87, 0xc4, 0x26));
+        XSSFColor green = new XSSFColor(new byte[]{ (byte) 0x87, (byte) 0xc4, (byte) 0x26 });
 
         normal = wb.createFont();
         normal.setFontName("Calibri");
@@ -65,7 +60,7 @@ public class ExcelWriter implements SheetWriter {
         normalStripeStyle = wb.createCellStyle();
         normalStripeStyle.setFont(normal);
         normalStripeStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        normalStripeStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        normalStripeStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         
         normalStripeBoldStyle = wb.createCellStyle();
         normalStripeBoldStyle.cloneStyleFrom(normalStripeStyle);
@@ -73,7 +68,7 @@ public class ExcelWriter implements SheetWriter {
         
         highlightStyle = wb.createCellStyle();
         highlightStyle.setFillForegroundColor( green );
-        highlightStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        highlightStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         highlightStyle.setFont(bold);
         highlightStyle.setWrapText(true);
         
@@ -85,7 +80,7 @@ public class ExcelWriter implements SheetWriter {
         currencyStripeStyle = wb.createCellStyle();
         currencyStripeStyle.cloneStyleFrom(currencyStyle);
         currencyStripeStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        currencyStripeStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        currencyStripeStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         currencyHighlightStyle = wb.createCellStyle();
         currencyHighlightStyle.cloneStyleFrom(currencyStripeStyle);

@@ -12,13 +12,8 @@ package com.epimorphics.standardReports.aggregators;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.commons.compress.archivers.zip.Zip64Mode;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -53,8 +48,12 @@ public class SExcelWriter implements SheetWriter {
         wb = new SXSSFWorkbook(basewb, 100, true);
 
         sheet = wb.createSheet("Top sheet");
-        
-        XSSFColor green = new XSSFColor(new java.awt.Color(0x87, 0xc4, 0x26));
+        // Fix libreoffice issues. Taken from: https://lists.apache.org/thread/fr1ddq8j4047jc9c73y531g6o8oqlj4x
+        // However fails for office 2016
+        // Alternative would be to use non-stream version. Standard Reports are generally pretty small sheets
+        // wb.setZip64Mode(Zip64Mode.AlwaysWithCompatibility);
+
+        XSSFColor green = new XSSFColor(new byte[]{ (byte) 0x87, (byte) 0xc4, (byte) 0x26 });
 
         normal = wb.createFont();
         normal.setFontName("Calibri");
@@ -69,7 +68,7 @@ public class SExcelWriter implements SheetWriter {
         normalStripeStyle = wb.createCellStyle();
         normalStripeStyle.setFont(normal);
         normalStripeStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        normalStripeStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        normalStripeStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         
         normalStripeBoldStyle = wb.createCellStyle();
         normalStripeBoldStyle.cloneStyleFrom(normalStripeStyle);
@@ -77,7 +76,7 @@ public class SExcelWriter implements SheetWriter {
         
         highlightStyle = wb.createCellStyle();
         ((XSSFCellStyle)highlightStyle).setFillForegroundColor( green );
-        highlightStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        highlightStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         highlightStyle.setFont(bold);
         highlightStyle.setWrapText(true);
         
@@ -89,7 +88,7 @@ public class SExcelWriter implements SheetWriter {
         currencyStripeStyle = wb.createCellStyle();
         currencyStripeStyle.cloneStyleFrom(currencyStyle);
         currencyStripeStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        currencyStripeStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        currencyStripeStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         currencyHighlightStyle = wb.createCellStyle();
         currencyHighlightStyle.cloneStyleFrom(currencyStripeStyle);

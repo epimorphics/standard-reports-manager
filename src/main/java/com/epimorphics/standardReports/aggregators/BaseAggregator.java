@@ -40,8 +40,8 @@ public abstract class BaseAggregator implements SRAggregator {
     
     @Override
     public void writeAsExcel(OutputStream out, MultivaluedMap<String, String> request) throws IOException {
-//        ExcelWriter writer = new ExcelWriter();
-        SExcelWriter writer = new SExcelWriter();
+        ExcelWriter writer = new ExcelWriter();
+//        SExcelWriter writer = new SExcelWriter();
         writer.setColumnWidths(widths);
         format(writer, request);
         writer.write(out);
