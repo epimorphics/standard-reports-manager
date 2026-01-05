@@ -167,7 +167,7 @@ Should have:
 1501k - 1750k  2
 1751k - 2000k  7
 
-Rerunning this in 2025 (presumably after data bacfilled) those values are:
+Rerunning this in 2025 (presumably after data backfilled) those values are:
 
 1001k - 1250k  1
 1251k - 1500k  2
