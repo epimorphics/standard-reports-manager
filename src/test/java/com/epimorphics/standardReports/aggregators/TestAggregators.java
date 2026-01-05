@@ -11,24 +11,22 @@ package com.epimorphics.standardReports.aggregators;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Files;
 
+import com.opencsv.exceptions.CsvValidationException;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.util.FileManager;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.junit.Test;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
 
 public class TestAggregators {
 
@@ -105,8 +103,8 @@ public class TestAggregators {
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         apa.writeAsCSV(out, request);
-        
-        String expected = FileManager.get().readWholeFileAsUTF8("src/test/data/testAPV.csv");
+
+        String expected = Files.readString(new File("src/test/data/testAPV.csv").toPath());
         assertEquals(expected, filterCreatedMetadata( out.toString() ));
         
         // Testing Excel output is correct is tricky (and currently manual) but at least this checks it runs
@@ -115,7 +113,7 @@ public class TestAggregators {
     }
     
     @Test
-    public void testBandedAggregator() throws IOException {
+    public void testBandedAggregator() throws IOException, CsvValidationException {
         BandedPriceAggregator bpa = new BandedPriceAggregator();
         
         // Replay a canned test query
@@ -148,8 +146,8 @@ public class TestAggregators {
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         bpa.writeAsCSV(out, request);
-        
-        String expected = FileManager.get().readWholeFileAsUTF8("src/test/data/devon-banded-agg.csv");
+
+        String expected = Files.readString(new File("src/test/data/devon-banded-agg.csv").toPath());
 //        System.out.println("TEMP:\n" + filterCreatedMetadata( out.toString() ));
         assertEquals(expected, filterCreatedMetadata( out.toString() ));
         

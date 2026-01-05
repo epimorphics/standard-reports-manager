@@ -15,6 +15,8 @@ import static com.epimorphics.standardReports.Constants.TEST_PARAM;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 import com.epimorphics.appbase.core.Shutdown;
@@ -28,7 +30,6 @@ import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.util.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,9 +187,8 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
         return srQueryFactory.get(templateName);
     }
 
-    public String getRawQuery(String templateName) {
-        return FileManager.get().readWholeFileAsUTF8(
-                new File(templateDir, templateName).getPath());
+    public String getRawQuery(String templateName) throws IOException  {
+        return Files.readString(new File(templateDir, templateName).toPath());
     }
 
     public class RequestProcessor implements Runnable {

@@ -10,11 +10,12 @@
 package com.epimorphics.standardReports;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.util.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +55,9 @@ public class SRQueryFactory {
     public String getRaw(String templateName) {
         String template = rawQueries.get(templateName);
         if (template == null) {
-            String fname = new File(templateDir, templateName).getPath();
+            Path fname = new File(templateDir, templateName).toPath();
             try {
-                template = FileManager.get().readWholeFileAsUTF8( fname );
+                template = Files.readString(fname);
                 rawQueries.put(templateName, template);
             } catch (Exception e) {
                 log.error("Could not locate template: " + templateName);
