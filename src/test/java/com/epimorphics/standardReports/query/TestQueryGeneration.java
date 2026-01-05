@@ -6,7 +6,7 @@ import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
-import javax.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 
 import static com.epimorphics.standardReports.Constants.*;
 

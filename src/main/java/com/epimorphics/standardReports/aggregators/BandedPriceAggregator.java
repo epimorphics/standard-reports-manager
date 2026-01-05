@@ -11,7 +11,7 @@ package com.epimorphics.standardReports.aggregators;
 
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.jena.query.QuerySolution;
 

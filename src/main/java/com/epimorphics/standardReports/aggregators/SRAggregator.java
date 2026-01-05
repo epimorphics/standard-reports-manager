@@ -12,7 +12,7 @@ package com.epimorphics.standardReports.aggregators;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 public interface SRAggregator extends Aggregator {
 
