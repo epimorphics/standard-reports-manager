@@ -6,8 +6,8 @@ RUN mvn -f /usr/src/app/pom.xml clean package
 
 # Package
 #FROM tomcat:9.0-jdk21-corretto-al2
-FROM tomcat:9.0-jdk21-corretto-al2
-RUN yum -y install shadow-utils
+FROM tomcat:10.1.50-jre21-temurin-noble
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 ## set up structured logging for tomcat
 ARG ECS_LOGGING_VERSION=1.2.0
@@ -21,7 +21,7 @@ COPY --from=build /usr/src/app/target/sr-manager*.war /usr/local/tomcat/webapps/
 COPY src/main/webapp/WEB-INF/app.conf /etc/standard-reports/app.conf
 COPY ./scripts /usr/local/bin
 
-RUN adduser -u 1012 app \
+RUN adduser --uid 1012 --disabled-password --gecos "" app \
   && chown -R app /usr/local/tomcat /etc/standard-reports
 USER app
 
