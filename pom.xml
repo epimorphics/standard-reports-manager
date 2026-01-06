@@ -20,8 +20,6 @@
       <logback-json.version>6.6</logback-json.version>
         <tomcat-version>10.1.50</tomcat-version>
       <armlib.version>1.0.0</armlib.version>
-      <appbase.version>4.0.0</appbase.version>
-      <lib.version>4.0.0</lib.version>
       <sapi.version>4.0.0</sapi.version>
       <jersey.version>3.1.11</jersey.version>
     </properties>
@@ -92,40 +90,10 @@
       <version>${sapi.version}</version>
     </dependency>
 
-      <!--
-    <dependency>
-      <groupId>com.epimorphics</groupId>
-      <artifactId>lib</artifactId>
-      <version>3.1.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.epimorphics</groupId>
-      <artifactId>appbase</artifactId>
-      <version>3.1.11</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>slf4j-log4j12</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>log4j</artifactId>
-          <groupId>log4j</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  -->
-
     <dependency>
       <groupId>com.epimorphics</groupId>
       <artifactId>armlib</artifactId>
       <version>${armlib.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>log4j</artifactId>
-          <groupId>log4j</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
