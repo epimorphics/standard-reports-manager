@@ -4,6 +4,13 @@ Reports manager for constructing batch reports.
 
 Implements both report submission/status tracking web service and backend report processor.
 
+## Changelog
+
+| Date | Version | Changes |
+|---|---|---|
+| 2026-01-06 | 0.2.1 | Dependency updates to java 21, tomcat 10, jersey 3 |
+| Prior to 2025-09-15 | 0.1.3 | Production deployed version |
+
 ## Endpoints provided
 
 ### Report processing
