@@ -13,7 +13,7 @@ import static com.epimorphics.standardReports.Constants.*;
 
 import java.util.regex.Matcher;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.XSD;

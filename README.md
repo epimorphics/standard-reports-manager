@@ -4,6 +4,13 @@ Reports manager for constructing batch reports.
 
 Implements both report submission/status tracking web service and backend report processor.
 
+## Changelog
+
+| Date | Version | Changes |
+|---|---|---|
+| 2026-01-06 | 0.2.1 | Dependency updates to java 21, tomcat 10, jersey 3 |
+| Prior to 2025-09-15 | 0.1.3 | Production deployed version |
+
 ## Endpoints provided
 
 ### Report processing
@@ -167,7 +174,7 @@ Should have:
 1501k - 1750k  2
 1751k - 2000k  7
 
-Rerunning this in 2025 (presumably after data bacfilled) those values are:
+Rerunning this in 2025 (presumably after data backfilled) those values are:
 
 1001k - 1250k  1
 1251k - 1500k  2

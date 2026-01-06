@@ -11,6 +11,7 @@ package com.epimorphics.standardReports.aggregators;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import org.apache.jena.query.QuerySolution;
 
@@ -89,7 +90,7 @@ public class Accumulator implements Aggregator {
         if (count == 0) {
             return new BigDecimal(0);
         } else {
-            return total.divide( new BigDecimal(count), scale, BigDecimal.ROUND_HALF_DOWN );
+            return total.divide( new BigDecimal(count), scale, RoundingMode.HALF_DOWN );
         }
     }
     

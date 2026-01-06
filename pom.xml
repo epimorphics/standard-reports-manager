@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.epimorphics</groupId>
   <artifactId>sr-manager</artifactId>
-  <version>0.1.3</version>
+  <version>0.2.1</version>
   <packaging>war</packaging>
   <name>sr-manager</name>
   <description>Standard Reports Manager</description>
@@ -13,13 +13,16 @@
     <tag>HEAD</tag>
   </scm>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <micrometer.version>1.7.5</micrometer.version>
-    <logback.version>1.3.15</logback.version>
-    <logback-json.version>6.6</logback-json.version>
-    <tomcat-version>9.0.108</tomcat-version>
-  </properties>
+    <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <micrometer.version>1.7.5</micrometer.version>
+      <logback.version>1.3.16</logback.version>
+      <logback-json.version>6.6</logback-json.version>
+        <tomcat-version>10.1.50</tomcat-version>
+      <armlib.version>1.0.1</armlib.version>
+      <sapi.version>4.0.0</sapi.version>
+      <jersey.version>3.1.11</jersey.version>
+    </properties>
 
   <repositories>
     <repository>
@@ -84,41 +87,13 @@
     <dependency>
       <groupId>com.epimorphics</groupId>
       <artifactId>sapi-lib</artifactId>
-      <version>2.2.0</version>
+      <version>${sapi.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.epimorphics</groupId>
-      <artifactId>lib</artifactId>
-      <version>3.1.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.epimorphics</groupId>
-      <artifactId>appbase</artifactId>
-      <version>3.1.11</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>slf4j-log4j12</artifactId>
-          <groupId>org.slf4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>log4j</artifactId>
-          <groupId>log4j</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  
     <dependency>
       <groupId>com.epimorphics</groupId>
       <artifactId>armlib</artifactId>
-      <version>0.4.0</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>log4j</artifactId>
-          <groupId>log4j</groupId>
-        </exclusion>
-      </exclusions>
+      <version>${armlib.version}</version>
     </dependency>
 
     <dependency>
@@ -136,10 +111,10 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
-      <scope>provided</scope>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>6.0.0</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -166,7 +141,7 @@
         <groupId>org.glassfish.jersey.containers</groupId>
         <!-- if your container implements Servlet API older than 3.0, use "jersey-container-servlet-core"  -->
         <artifactId>jersey-container-servlet</artifactId>
-        <version>2.25.1</version>
+        <version>${jersey.version}</version>
     </dependency>
 
     <dependency>
@@ -213,10 +188,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>3.14.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>21</source>
+          <target>21</target>
         </configuration>
       </plugin>
 
@@ -229,11 +204,6 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.3.2</version>
-      </plugin>
     </plugins>
 
     <extensions>
@@ -247,21 +217,27 @@
         <groupId>org.springframework.build</groupId>
         <artifactId>aws-maven</artifactId>
         <version>5.0.0.RELEASE</version>
-      <!-- 
-        <groupId>org.springframework.build.aws</groupId>  
-        <artifactId>org.springframework.build.aws.maven</artifactId>  
-        <version>3.0.0.RELEASE</version>          
-      -->
       </extension>
     </extensions>
 
   </build>
-  
-  <distributionManagement>
-    <repository>
-      <id>epi-public-repo</id>
-      <url>ftp://epimorphics.com</url>
-    </repository>
-  </distributionManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>epi-public-s3-release</id>
+            <name>Epimorphics S3 release repository</name>
+            <url>s3://epi-repository/release</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+
+        <snapshotRepository>
+            <id>epi-public-s3-snapshot</id>
+            <name>Epimorphics S3 snapshot repository</name>
+            <url>s3://epi-repository/snapshot</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

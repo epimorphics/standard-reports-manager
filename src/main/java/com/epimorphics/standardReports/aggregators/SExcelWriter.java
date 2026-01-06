@@ -171,7 +171,7 @@ public class SExcelWriter implements SheetWriter {
     public void write(OutputStream out) throws IOException {
         wb.write(out);
         out.close();
-        wb.dispose();
+        // wb.dispose(); // This is now deprecated and clean up is all done within wb.close
         wb.close();
     }
     

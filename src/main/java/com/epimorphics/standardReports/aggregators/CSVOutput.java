@@ -15,7 +15,7 @@ import java.io.OutputStreamWriter;
 
 import com.epimorphics.util.EpiException;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVWriter;
 
 /**
  * Support for writing standard reports out as CSV files.
