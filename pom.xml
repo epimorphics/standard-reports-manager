@@ -16,7 +16,7 @@
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <micrometer.version>1.7.5</micrometer.version>
-      <logback.version>1.3.16</logback.version>
+      <logback.version>1.5.25</logback.version>
       <logback-json.version>6.6</logback-json.version>
         <tomcat-version>10.1.50</tomcat-version>
       <armlib.version>1.0.1</armlib.version>
