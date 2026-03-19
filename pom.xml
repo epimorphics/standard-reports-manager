@@ -18,7 +18,7 @@
       <micrometer.version>1.7.5</micrometer.version>
       <logback.version>1.5.28</logback.version>
       <logback-json.version>8.1</logback-json.version>
-        <tomcat-version>10.1.50</tomcat-version>
+        <tomcat-version>10.1.52</tomcat-version>
       <armlib.version>1.0.2</armlib.version>
       <sapi.version>4.0.1</sapi.version>
       <jersey.version>3.1.11</jersey.version>
