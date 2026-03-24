@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.epimorphics</groupId>
   <artifactId>sr-manager</artifactId>
-  <version>0.2.3</version>
+  <version>0.2.4</version>
   <packaging>war</packaging>
   <name>sr-manager</name>
   <description>Standard Reports Manager</description>
@@ -16,11 +16,11 @@
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <micrometer.version>1.7.5</micrometer.version>
-      <logback.version>1.5.28</logback.version>
+      <logback.version>1.5.32</logback.version>
       <logback-json.version>8.1</logback-json.version>
         <tomcat-version>10.1.52</tomcat-version>
-      <armlib.version>1.0.2</armlib.version>
-      <sapi.version>4.0.1</sapi.version>
+      <armlib.version>1.0.3</armlib.version>
+      <sapi.version>4.0.2</sapi.version>
       <jersey.version>3.1.11</jersey.version>
     </properties>
 
@@ -160,6 +160,12 @@
       <groupId>net.logstash.logback</groupId>
       <artifactId>logstash-logback-encoder</artifactId>
         <version>${logback-json.version}</version>
+        <exclusions>
+            <exclusion>
+                <artifactId>jackson-databind</artifactId>
+                <groupId>com.fasterxml.jackson.core</groupId>
+            </exclusion>
+        </exclusions>
     </dependency>
 
     <dependency>
