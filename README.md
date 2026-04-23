@@ -55,11 +55,11 @@ Resume report processing:
 
 Return the current status of report processing (Running, Suspending, or Suspended):
 
-    POST /sr-manager/system/status
+    GET /sr-manager/system/status
 
 Prometheus metrics scrape endpoint:
 
-    POST /sr-manager/system/metrics
+    GET /sr-manager/system/metrics
 
 ## Requests
 
