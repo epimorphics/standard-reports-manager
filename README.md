@@ -115,6 +115,11 @@ Tables `{prefix}-Queue` and `{prefix}-Completed` will be created and used for th
 
 **Note:** Recent growth in the number of standard reports processed has meant that the provisioning of the `{prefix}-Completed` table is not enough for production and clearing that table can take 10 minutes or more. Recommend changing the provisioning to on-demand.
 
+## Geographic mappings
+
+Mapping between regions and top level "counties" (which may actually be higher level groupings like GREATER LONDON and GREATER MANCHESTER) are implemented in query fragments in src/main/resources/WEB-INF/queryTemplates. If new top level authorities are added then these will need to be updated. Add the value to both the `region_XXX.sq` values list and the `regionAggregate.sq` switch statement.
+
+A future improvement would be to put the region mapping into the data itself and rewrite the queries to use that.
 
 ## Ops actions
 
