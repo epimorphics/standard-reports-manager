@@ -16,10 +16,10 @@
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <micrometer.version>1.7.5</micrometer.version>
-      <logback.version>1.5.33</logback.version>
+      <logback.version>1.5.37</logback.version>
       <logback-json.version>8.1</logback-json.version>
         <tomcat-version>10.1.55</tomcat-version>
-      <armlib.version>1.0.4</armlib.version>
+      <armlib.version>1.0.5</armlib.version>
       <sapi.version>4.0.4</sapi.version>
       <jersey.version>3.1.11</jersey.version>
     </properties>
