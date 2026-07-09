@@ -6,6 +6,8 @@ Implements both report submission/status tracking web service and backend report
 
 ## Changelog
 
+* `0.2.6` - dependency updates (not released yet)
+* `0.2.5` - add Bournemouth, Christchurch and Poole, North and West Northamptonshire
 * `0.2.2` - minor dependency updates
 * `0.2.1` - major dependency updates to java 21, tomcat 10, jersey 3
 * `0.1.3` - prior production deployed version

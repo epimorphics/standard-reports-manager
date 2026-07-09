@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.epimorphics</groupId>
   <artifactId>sr-manager</artifactId>
-  <version>0.2.5</version>
+  <version>0.2.6</version>
   <packaging>war</packaging>
   <name>sr-manager</name>
   <description>Standard Reports Manager</description>
@@ -20,7 +20,7 @@
       <logback-json.version>8.1</logback-json.version>
         <tomcat-version>10.1.55</tomcat-version>
       <armlib.version>1.0.5</armlib.version>
-      <sapi.version>4.0.4</sapi.version>
+      <sapi.version>4.0.6</sapi.version>
       <jersey.version>3.1.11</jersey.version>
     </properties>
 
