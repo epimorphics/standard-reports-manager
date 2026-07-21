@@ -5,8 +5,7 @@ COPY pom.xml /usr/src/app
 RUN mvn -f /usr/src/app/pom.xml clean package
 
 # Package
-#FROM tomcat:9.0-jdk21-corretto-al2
-FROM tomcat:10.1.50-jre21-temurin-noble
+FROM tomcat:10.1.57-jre21-temurin-noble
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 ## set up structured logging for tomcat
