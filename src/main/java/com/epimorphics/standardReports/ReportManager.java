@@ -74,12 +74,6 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
         Running, Suspending, Suspended
     };
 
-    private static String ID_HEADER = "report-id";
-    private static String PROCESSING_STATE_HEADER = "state";
-    private enum ProcessingState {
-        Accepted, Processing, Completed, Error
-    };
-
     public RequestManager getRequestManager() {
         return requestManager;
     }
@@ -209,9 +203,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                 while ( ! suspend ) {
                     BatchRequest request = queue.nextRequest(1000);
                     if (request != null) {
-                        logHeaders(request, ProcessingState.Accepted);
-                        MDC.put(LogRequestFilter.REPORT_ID_LOG_FIELD, request.getKey());
-                        MDC.put(LogRequestFilter.REQUEST_STATUS_FIELD, "processing");
+                        logHeaders(request, "received");
                         log.info("Processing report: " + request.getKey());
 
                         if (request.getParameters().containsKey(TEST_PARAM)) {
@@ -229,8 +221,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                             SRQuery query = srQueryFactory.get(queryTemplate);
 
                             if (query == null) {
-                                logHeaders(request, ProcessingState.Error);
-                                MDC.put(LogRequestFilter.REQUEST_STATUS_FIELD, "error");
+                                logHeaders(request, "error");
                                 log.error(
                                         "Fatal configuration error: can't find query - "
                                                 + queryTemplate);
@@ -245,7 +236,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                                     try {
                                         long start = System.currentTimeMillis();
                                         String queryStr = query.getQuery();
-                                        logHeaders(request, ProcessingState.Processing);
+                                        logHeaders(request, "processing");
                                         log.info("Running query: " + queryStr);
                                         ResultSet results = source
                                                 .select(queryStr);
@@ -276,8 +267,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                                         long duration = System
                                                 .currentTimeMillis() - start;
                                         MDC.put("duration", Long.toString(duration*1000));
-                                        logHeaders(request, ProcessingState.Completed);
-                                        MDC.put(LogRequestFilter.REQUEST_STATUS_FIELD, "completed");
+                                        logHeaders(request, "completed");
                                         log.info("Report completed: "
                                                 + request.getKey() + " in "
                                                 + NameUtils.formatDuration(
@@ -288,7 +278,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
 
                                     } catch (Exception e) {
                                         if (retry < RETRY_LIMIT - 1) {
-                                            logHeaders(request, ProcessingState.Processing);
+                                            logHeaders(request, "processing");
                                             log.warn(
                                                     "Request "
                                                             + request.getKey()
@@ -297,7 +287,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                                             metricRetries.increment();
                                             Thread.sleep(10000);
                                         } else {
-                                            logHeaders(request, ProcessingState.Error);
+                                            logHeaders(request, "error");
                                             log.error("Request "
                                                     + request.getKey()
                                                     + " failed", e);
@@ -317,9 +307,9 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
             log.info("Report processing halted");
         }
 
-        private void logHeaders(BatchRequest request, ProcessingState state) {
-            MDC.put(ID_HEADER, request.getKey());
-            MDC.put(PROCESSING_STATE_HEADER, state.name());
+        private void logHeaders(BatchRequest request, String state) {
+            MDC.put(LogRequestFilter.REPORT_ID_LOG_FIELD, request.getKey());
+            MDC.put(LogRequestFilter.REQUEST_STATUS_FIELD, state);
         }
     }
 }
