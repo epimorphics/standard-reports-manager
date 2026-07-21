@@ -93,6 +93,10 @@
                 <artifactId>httpclient5</artifactId>
                 <groupId>org.apache.httpcomponents.client5</groupId>
             </exclusion>
+            <exclusion>
+                <artifactId>httpcore5</artifactId>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+            </exclusion>
         </exclusions>
     </dependency>
 
