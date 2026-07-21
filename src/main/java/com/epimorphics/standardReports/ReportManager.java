@@ -211,6 +211,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                     if (request != null) {
                         logHeaders(request, ProcessingState.Accepted);
                         MDC.put(LogRequestFilter.REPORT_ID_LOG_FIELD, request.getKey());
+                        MDC.put(LogRequestFilter.REQUEST_STATUS_FIELD, "processing");
                         log.info("Processing report: " + request.getKey());
 
                         if (request.getParameters().containsKey(TEST_PARAM)) {
@@ -229,6 +230,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
 
                             if (query == null) {
                                 logHeaders(request, ProcessingState.Error);
+                                MDC.put(LogRequestFilter.REQUEST_STATUS_FIELD, "error");
                                 log.error(
                                         "Fatal configuration error: can't find query - "
                                                 + queryTemplate);
@@ -275,6 +277,7 @@ public class ReportManager extends ComponentBase implements Startup, Shutdown {
                                                 .currentTimeMillis() - start;
                                         MDC.put("duration", Long.toString(duration*1000));
                                         logHeaders(request, ProcessingState.Completed);
+                                        MDC.put(LogRequestFilter.REQUEST_STATUS_FIELD, "completed");
                                         log.info("Report completed: "
                                                 + request.getKey() + " in "
                                                 + NameUtils.formatDuration(

@@ -31,6 +31,7 @@ public class LogRequestFilter implements Filter {
     public static final String REQUEST_ID_HEADER  = "X-Request-ID";
     public static final String REQUEST_ID_LOG_FIELD  = "request_id";
     public static final String REPORT_ID_LOG_FIELD  = "report_id";
+    public static final String REQUEST_STATUS_FIELD  = "request_status";
 
     static final Logger log = LoggerFactory.getLogger( LogRequestFilter.class );
 

@@ -68,6 +68,7 @@ public class ReportRequestEndpoint extends SREndpointBase {
         BatchStatus bs = getRequestManager().submit( makeBatchRequest(request) );
         String statusURL = context.getContextPath() + "/report-request/" + bs.getKey();
         MDC.put(LogRequestFilter.REPORT_ID_LOG_FIELD, bs.getKey());
+        MDC.put(LogRequestFilter.REQUEST_STATUS_FIELD, "received");
         try {
             return Response.created( new URI(statusURL) ).build();
         } catch (URISyntaxException e) {
