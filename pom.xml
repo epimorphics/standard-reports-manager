@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.epimorphics</groupId>
   <artifactId>sr-manager</artifactId>
-  <version>0.2.6</version>
+  <version>0.2.7</version>
   <packaging>war</packaging>
   <name>sr-manager</name>
   <description>Standard Reports Manager</description>
@@ -88,6 +88,12 @@
       <groupId>com.epimorphics</groupId>
       <artifactId>sapi-lib</artifactId>
       <version>${sapi.version}</version>
+        <exclusions>
+            <exclusion>
+                <artifactId>httpclient5</artifactId>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+            </exclusion>
+        </exclusions>
     </dependency>
 
     <dependency>
