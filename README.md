@@ -6,6 +6,7 @@ Implements both report submission/status tracking web service and backend report
 
 ## Changelog
 
+* `0.2.7` - dependency updates - appbase, micrometer, log4j, poi
 * `0.2.7` - fix dependency clash between jena (libthrift) and aws (s3)
 * `0.2.6` - dependency updates, logging improvements
 * `0.2.5` - add Bournemouth, Christchurch and Poole, North and West Northamptonshire
